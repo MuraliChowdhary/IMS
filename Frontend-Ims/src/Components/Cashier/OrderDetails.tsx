@@ -54,7 +54,7 @@
 //         try {
 //           const orders = JSON.parse(storedOrder);
 //           console.log("Parsed Orders:", orders); // Debugging line
-    
+
 //           if (Array.isArray(orders)) {
 //             const orderDetails = orders.find((order: OrderDetailsProps) => order.id === orderId);
 //             console.log("Order Details:", orderDetails); // Debugging line
@@ -74,16 +74,15 @@
 //       }
 
 //     }, [orderId]);
-    
+
 //     if (!order) {
 //       return <div>Loading...</div>;
 //     }
-  
+
 //     const calculateTotal = () => {
 //       if (!order.products || !Array.isArray(order.products)) return 0;
 //       return order.products.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
 //     };
-
 
 //     const Payment = async function () {
 //       if(loading)return
@@ -98,18 +97,18 @@
 //               productMap.set(productId, 1);
 //             }
 //           });
-    
+
 //           const products = Array.from(productMap.entries()).map(
 //             ([productId, quantity]) => ({
 //               productId,
 //               quantity,
 //             })
 //           );
-    
+
 //           const totalAmount = order.products.reduce((total, p) => {
 //             return total + p.product.price * (p.quantity || 1);
 //           }, 0);
-    
+
 //           const response = await axios.post(
 //             `${BACKEND_URL}/api/cashier/order`,
 //             { orderId:order.id,
@@ -125,13 +124,13 @@
 //             }
 //           );
 //           console.log(response.data.order);
-    
+
 //           const orderId = response.data.order.razorpayOrderId;
 //           const amt = response.data.order.totalAmount;
-    
+
 //           setOrderID(orderId);
 //           setAmount(amt);
-    
+
 //           setShowPayment(true);
 //           console.log(orderId + " " + amt + " " + showPayment);
 //         } catch {
@@ -141,8 +140,7 @@
 //           setLoading(false);
 //         }
 //       };
-    
-    
+
 //       const handleCancel = async (orderId: string) => {
 //         if(loading)return
 //         setLoading(true);
@@ -157,9 +155,9 @@
 //               },
 //             }
 //           );
-      
+
 //           if (response.status === 200 || response.status === 204) {
-         
+
 //             //console.log("Order cancelled successfully");
 //             setSuccess(response.data.message || "Order has been cancelled.");
 //            navigate("/cashierDashboard");
@@ -185,9 +183,7 @@
 //           setLoading(false);
 //         }
 //       };
-      
-      
-  
+
 //     return (
 //       <div>
 
@@ -195,7 +191,6 @@
 //               {error && <div className="text-red-500 text-xl text-center mr-5 mt-5 font-bold ">{error}</div>}
 //               {success && <div className="text-green-500 text-xl text-center mr-5 mt-5 font-bold ">{success}</div>}
 //               </div>
-      
 
 //         <div className='text-center text-2xl text-gray-900 mt-15 font-bold'>
 //           <h2>Order Details</h2>
@@ -208,7 +203,7 @@
 //             </div>
 //             <p className="text-sm text-gray-600">Order ID: {order.id}</p>
 //           </div>
-     
+
 //           <div className="border-b p-4">
 //             <div className="flex items-center gap-2 mb-2">
 //               <User size={20} className="text-gray-600" />
@@ -217,7 +212,7 @@
 //             <p className="text-sm">{order.customer.username}</p>
 //             <p className="text-sm text-gray-600">{order.customer.email}</p>
 //           </div>
-         
+
 //           <div className="p-4 border-b">
 //             <div className="flex items-center gap-2 mb-3">
 //               <Package size={20} className="text-gray-600" />
@@ -250,7 +245,7 @@
 //               ))}
 //             </div>
 //           </div>
-  
+
 //           <div className="p-4">
 //             <div className="flex justify-between items-center mb-2">
 //               <span className="font-medium">Subtotal:</span>
@@ -267,9 +262,9 @@
 //               </div>
 //             </div>
 //           </div>
-  
+
 //           <div className="border-t mb-2 flex space-x-10 px-2 py-4">
-   
+
 //           {loading ? (
 //             <LoadingBUtton />
 //           ) : (
@@ -284,7 +279,7 @@
 //           )}
 
 //               {showPayment && orderId1 && amt && <ProcessPayment orderId={orderId1} amount={amt} />}
-                
+
 //            {loading ? <LoadingBUtton/>: <button
 //                   onClick={() => handleCancel(order.id)}
 //                   className="w-full bg-red-600 hover:bg-red-800 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 cursor-pointer"
@@ -297,17 +292,16 @@
 //       </div>
 //     );
 //   };
-  
-//   export default OrderDetails;
-  
 
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+//   export default OrderDetails;
+
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
 import { Receipt, Package, User } from "lucide-react";
-import { BACKEND_URL } from '../../../Config';
-import { ProcessPayment } from './ProcessPayment';
-import { LoadingBUtton } from '../LoadingButton';
+import { BACKEND_URL } from "../../../Config";
+import { ProcessPayment } from "./ProcessPayment";
+import { LoadingBUtton } from "../LoadingButton";
 
 interface Product {
   id: string;
@@ -359,7 +353,9 @@ const OrderDetails = () => {
       try {
         const orders = JSON.parse(storedOrder);
         if (Array.isArray(orders)) {
-          const orderDetails = orders.find((order: OrderDetailsProps) => order.id === orderId);
+          const orderDetails = orders.find(
+            (order: OrderDetailsProps) => order.id === orderId
+          );
           if (orderDetails) {
             setOrder(orderDetails);
           }
@@ -371,14 +367,19 @@ const OrderDetails = () => {
   }, [orderId]);
 
   if (!order) {
-    return <div className="flex justify-center items-center h-screen">
-      <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-    </div>;
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
   }
 
   const calculateTotal = () => {
     if (!order.products || !Array.isArray(order.products)) return 0;
-    return order.products.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+    return order.products.reduce(
+      (sum, item) => sum + item.product.price * item.quantity,
+      0
+    );
   };
 
   const Payment = async function () {
@@ -408,7 +409,7 @@ const OrderDetails = () => {
 
       const response = await axios.post(
         `${BACKEND_URL}/api/cashier/order`,
-        { 
+        {
           orderId: order.id,
           customerId: order.customerId,
           products: products,
@@ -495,7 +496,9 @@ const OrderDetails = () => {
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           <div className="border-b p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold text-gray-800">Order Receipt</h2>
+              <h2 className="text-2xl font-bold text-gray-800">
+                Order Receipt
+              </h2>
               <Receipt className="text-gray-600" size={28} />
             </div>
             <p className="text-sm text-gray-600">Order ID: {order.id}</p>
@@ -534,11 +537,13 @@ const OrderDetails = () => {
                   </div>
                   <div className="text-right ml-4">
                     <p className="font-medium text-gray-800">
-                      ₹{(item.product?.price || 0).toFixed(2)}
+                      ${(item.product?.price || 0).toFixed(2)}
                     </p>
-                    <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
+                    <p className="text-sm text-gray-600">
+                      Qty: {item.quantity}
+                    </p>
                     <p className="text-sm font-medium mt-1">
-                      ₹{(item.product?.price * item.quantity || 0).toFixed(2)}
+                      ${(item.product?.price * item.quantity || 0).toFixed(2)}
                     </p>
                   </div>
                 </div>
@@ -550,16 +555,18 @@ const OrderDetails = () => {
             <div className="space-y-3">
               <div className="flex justify-between items-center">
                 <span className="font-medium text-gray-700">Subtotal:</span>
-                <span className="font-medium">₹{calculateTotal().toFixed(2)}</span>
+                <span className="font-medium">
+                  ${calculateTotal().toFixed(2)}
+                </span>
               </div>
               <div className="flex justify-between items-center text-gray-600">
                 <span>Tax (10%):</span>
-                <span>₹{(calculateTotal() * 0.1).toFixed(2)}</span>
+                <span>${(calculateTotal() * 0.1).toFixed(2)}</span>
               </div>
               <div className="border-t pt-3 mt-3">
                 <div className="flex justify-between items-center font-bold text-lg">
                   <span>Total:</span>
-                  <span>₹{(calculateTotal() * 1.1).toFixed(2)}</span>
+                  <span>${(calculateTotal() * 1.1).toFixed(2)}</span>
                 </div>
               </div>
             </div>
@@ -569,16 +576,16 @@ const OrderDetails = () => {
             <div className="flex flex-col sm:flex-row gap-4">
               <div className="flex-1">
                 {loading ? (
-                  <LoadingBUtton  />
+                  <LoadingBUtton />
                 ) : !showPayment ? (
                   <button
                     onClick={Payment}
                     disabled={loading}
                     className={`w-full h-12 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-colors duration-200 flex items-center justify-center cursor-pointer${
-                      loading ? 'opacity-70 cursor-not-allowed' : ''
+                      loading ? "opacity-70 cursor-not-allowed" : ""
                     }`}
                   >
-                  Order
+                    Order
                   </button>
                 ) : (
                   <ProcessPayment orderId={orderId1!} amount={amt!} />
@@ -592,7 +599,7 @@ const OrderDetails = () => {
                     onClick={() => handleCancel(order.id)}
                     disabled={cancelLoading}
                     className={`w-full h-12 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg transition-colors duration-200 cursor-pointer${
-                      cancelLoading ? 'opacity-70 cursor-not-allowed' : ''
+                      cancelLoading ? "opacity-70 cursor-not-allowed" : ""
                     }`}
                   >
                     Cancel Order

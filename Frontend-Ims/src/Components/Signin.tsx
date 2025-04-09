@@ -173,8 +173,8 @@ export const Signin = () => {
     navigate("/supplier/login");
   };
   return (
-    <div>
-      <div className="bg-gradient-to-br from-cyan-500/20 to-blue-600/80 h-screen text-white flex justify-center items-center">
+    <div className="">
+      <div className=" h-screen text-white flex justify-center items-center">
         <div className="bg-slate-50 w-96 h-auto rounded-2xl p-12 shadow-2xl flex flex-col justify-evenly items-center">
           <div className="text-center text-2xl font-bold tracking-tight text-gray-900">
             Sign in

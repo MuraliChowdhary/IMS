@@ -136,9 +136,9 @@ export const ProductsCard = () => {
         <div className="flex flex-col items-start">
           <div className="flex items-center mb-4">
             <div className="text-green-700 font-semibold text-xl mr-4">
-              Now ₹{finalPrice.toFixed(2)}
+              Now ${finalPrice.toFixed(2)}
             </div>
-            <div className="line-through text-gray-500">₹{product.price}</div>
+            <div className="line-through text-gray-500">${product.price}</div>
           </div>
 
           {isAddedToCart ? (

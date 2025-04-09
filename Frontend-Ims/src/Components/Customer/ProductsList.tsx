@@ -105,10 +105,10 @@ export const ProductsList = () => {
           </div>
           <div className="flex space-x-3">
             <div className="ml-10 text-green-700 font-semibold">
-              Now ₹{calculateFinalPrice(product).toFixed(2)}
+              Now ${calculateFinalPrice(product).toFixed(2)}
             </div>
             <div className="ml-10 text-gray-500 text-sm line-through">
-              ₹{product.price}
+              ${product.price}
             </div>
           </div>
           <div className="ml-10">{product.description}</div>

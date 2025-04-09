@@ -1,229 +1,164 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
-import { Menu, X } from "lucide-react";
+"use client"
 
-const Nav = () => {
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+import * as React from "react"
+import { Link } from "react-router-dom"
+import { cn } from "@/lib/utils"
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "../ui/navigation-menu"
+import { Button } from "../ui/button"
 
-  const menuItems = [
-    {
-      label: "Product",
-      submenu: [
-        { label: "Design", icon: "□" },
-        { label: "Content", icon: "○" },
-        { label: "Publish", icon: "△" },
-      ],
-    },
-    {
-      label: "Resources",
-      submenu: [
-        { label: "Documentation" },
-        { label: "Guides" },
-        { label: "Tutorials" },
-      ],
-    },
-    {
-      label: "Community",
-      submenu: [{ label: "Forum" }, { label: "Discord" }, { label: "Events" }],
-    },
-  ];
-
-  const toggleMobileMenu = () => {
-    setMobileMenuOpen(!mobileMenuOpen);
-  };
-
+export function NavigationMenuDemo() {
   return (
-    <nav className="bg-white border-b border-gray-100 sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Main navigation container */}
-        <div className="flex justify-between h-16 items-center">
-          {/* Logo */}
-          <div className="flex items-center">
-            <span className="text-2xl font-extrabold text-blue-900 cursor-pointer">
-              Primemart
-            </span>
-          </div>
+    <div className="flex justify-between items-center w-full h-16 border-b  border-gray-800 bg-black px-6">
+      {/* Logo/Brand */}
+      <Link to="/" className="flex items-center space-x-2 mr-8">
+        <span className="text-xl font-bold text-white">Primemart</span>
+      </Link>
 
-          {/* Desktop Navigation (hidden on mobile) */}
-          <div className="hidden md:flex items-center space-x-6">
-            {menuItems.map((item) => (
-              <div
-                key={item.label}
-                className="relative"
-                onMouseEnter={() => setActiveDropdown(item.label)}
-                onMouseLeave={() => setActiveDropdown(null)}
-              >
-                <button className="text-blue-900 font-medium hover:text-gray-500 flex items-center">
-                  {item.label}
-                  <svg
-                    className={`ml-1 h-4 w-4 transition-transform ${
-                      activeDropdown === item.label ? "rotate-180" : ""
-                    }`}
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                </button>
-
-                {activeDropdown === item.label && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5"
-                  >
-                    <div className="py-1">
-                      {item.submenu.map((subItem) => (
-                        <a
-                          key={subItem.label}
-                          href="#"
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        >
-                          {"icon" in subItem && (
-                            <span className="mr-2">{subItem.icon}</span>
-                          )}
-                          {subItem.label}
-                        </a>
-                      ))}
+      {/* Main Navigation */}
+      <NavigationMenu>
+        <NavigationMenuList className="gap-1">
+          <NavigationMenuItem>
+            <NavigationMenuTrigger className="bg-black text-white hover:bg-black data-[state=open]:bg-black">
+              Dashboard
+            </NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <ul className="grid gap-3 p-6 md:w-[300px] lg:w-[500px] lg:grid-cols-[.75fr_1fr] bg-gray-900 text-white">
+                <li className="row-span-3">
+                  <NavigationMenuLink asChild>
+                    <div className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-gray-800 to-gray-900 p-6 no-underline outline-none focus:shadow-md border border-gray-700">
+                      <div className="mb-2 mt-4 text-lg font-medium text-white">
+                        Inventory Overview
+                      </div>
+                      <p className="text-sm leading-tight text-gray-200">
+                        Real-time insights into your stock levels, movements, and alerts.
+                      </p>
                     </div>
-                  </motion.div>
-                )}
-              </div>
-            ))}
-            <a href="#" className="text-blue-900 font-medium hover:text-gray-500">
-              Pricing
-            </a>
-          </div>
+                  </NavigationMenuLink>
+                </li>
+                <ListItem href="/dashboard/summary" title="Summary" className="hover:bg-gray-800 hover:text-white">
+                  Quick view of your inventory health metrics
+                </ListItem>
+                <ListItem href="/dashboard/alerts" title="Alerts" className="hover:bg-gray-800 hover:text-gray-200">
+                  Active alerts requiring your attention
+                </ListItem>
+                 
+              </ul>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
 
-          {/* Auth buttons (hidden on mobile) */}
-          <div className="hidden md:flex items-center space-x-4">
-            <motion.a
-              whileHover={{ scale: 1.05 }}
-              href="#"
-              className="text-blue-900 font-medium flex items-center"
-            >
-              Sign In
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="ml-1 h-4 w-4"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="m8.25 4.5 7.5 7.5-7.5 7.5"
-                />
-              </svg>
-            </motion.a>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              className="bg-teal-600 text-white px-4 py-2 rounded-full font-medium"
-            >
-              Start Free
-            </motion.button>
-          </div>
-
-          {/* Mobile menu button (hidden on desktop) */}
-          <div className="md:hidden flex items-center">
-            <button
-              onClick={toggleMobileMenu}
-              className="inline-flex items-center justify-center p-2 rounded-md text-blue-900 hover:text-gray-500 focus:outline-none"
-            >
-              {mobileMenuOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile menu (shown when toggled) */}
-      {mobileMenuOpen && (
-        <div className="md:hidden bg-white shadow-lg">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            {menuItems.map((item) => (
-              <div key={item.label} className="px-3 py-2">
-                <button
-                  className="w-full flex justify-between items-center text-blue-900 font-medium"
-                  onClick={() =>
-                    setActiveDropdown(
-                      activeDropdown === item.label ? null : item.label
-                    )
-                  }
+          <NavigationMenuItem>
+            <NavigationMenuTrigger className="bg-black text-white hover:bg-black data-[state=open]:bg-black">
+              Inventory
+            </NavigationMenuTrigger>
+            <NavigationMenuContent>
+              <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] bg-gray-900 text-white">
+                <ListItem
+                  href="/inventory/items"
+                  title="All Items"
+                  className="hover:bg-gray-800"
                 >
-                  <span>{item.label}</span>
-                  <svg
-                    className={`ml-1 h-4 w-4 transition-transform ${
-                      activeDropdown === item.label ? "rotate-180" : ""
-                    }`}
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                </button>
-                {activeDropdown === item.label && (
-                  <div className="mt-2 pl-4 space-y-2">
-                    {item.submenu.map((subItem) => (
-                      <a
-                        key={subItem.label}
-                        href="#"
-                        className="block px-3 py-2 text-base font-medium text-blue-900 hover:bg-gray-50 rounded-md"
-                      >
-                        {"icon" in subItem && (
-                          <span className="mr-2">{subItem.icon}</span>
-                        )}
-                        {subItem.label}
-                      </a>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-            <a
-              href="#"
-              className="block px-3 py-2 text-base font-medium text-blue-900 hover:bg-gray-50 rounded-md"
-            >
-              Pricing
-            </a>
-          </div>
-          <div className="pt-4 pb-3 border-t border-gray-200 px-5 space-y-3">
-            <motion.a
-              whileTap={{ scale: 0.95 }}
-              href="#"
-              className="w-full flex items-center justify-center px-4 py-2 text-base font-medium text-blue-900"
-            >
-              Sign In
-            </motion.a>
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              className="w-full flex items-center justify-center px-4 py-2 bg-teal-600 text-white rounded-full font-medium"
-            >
-              Start Free
-            </motion.button>
-          </div>
-        </div>
-      )}
-    </nav>
-  );
-};
+                  Browse and manage all inventory items
+                </ListItem>
+                <ListItem
+                  href="/inventory/categories"
+                  title="Categories"
+                  className="hover:bg-gray-800"
+                >
+                  Organize items by categories
+                </ListItem>
+                <ListItem
+                  href="/inventory/low-stock"
+                  title="Low Stock"
+                  className="hover:bg-gray-800 text-amber-400"
+                >
+                  Items below reorder threshold
+                </ListItem>
+                <ListItem
+                  href="/inventory/expiring"
+                  title="Expiring Soon"
+                  className="hover:bg-gray-800 text-red-400"
+                >
+                  Items nearing expiration date
+                </ListItem>
+              </ul>
+            </NavigationMenuContent>
+          </NavigationMenuItem>
 
-export default Nav;
+          <NavigationMenuItem>
+            <Link to="/orders">
+              <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "bg-gray-black text-white   ")}>
+                Orders
+              </NavigationMenuLink>
+            </Link>
+          </NavigationMenuItem>
+
+          <NavigationMenuItem>
+            <Link to="/suppliers">
+              <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "bg-gray-black text-white")}>
+                Suppliers
+              </NavigationMenuLink>
+            </Link>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>
+
+      {/* Auth Buttons */}
+      <div className="flex items-center space-x-2 ml-auto">
+         <Button variant="outline" className="hidden lg:block  bg-blue-500 border-none text-white"  onClick={() => window.location.href = "/signup"}>
+          Sign In
+        </Button>
+        <Button variant="outline" className="hidden lg:block bg-gray-900 text-white border-none" onClick={() => window.location.href = "/signin"}>Login</Button>
+      </div>
+    </div>
+  )
+}
+
+interface ListItemProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+  className?: string;
+  title: string;
+  children: React.ReactNode;
+}
+
+const ListItem = React.forwardRef<HTMLAnchorElement, ListItemProps>(
+  ({ className, title, children, ...props }, ref) => {
+    return (
+      <li>
+        <NavigationMenuLink asChild>
+          <a
+            ref={ref}
+            className={cn(
+              "block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:text-white focus:bg-gray-800 focus:text-white text-gray-300",
+              className
+            )}
+            {...props}
+          >
+            <div className="text-sm font-medium leading-none">{title}</div>
+            <p className="line-clamp-2 text-sm leading-snug text-gray-400">
+              {children}
+            </p>
+          </a>
+        </NavigationMenuLink>
+      </li>
+    )
+  }
+)
+ListItem.displayName = "ListItem"
+
+export const LandingPage2 = () => {
+  return (
+    <div className="bg-black flex flex-col min-h-screen text-white">
+      <header className="w-full border-b border-gray-800">
+        <NavigationMenuDemo />
+      </header>
+     
+    </div>
+  )
+}

@@ -2,22 +2,49 @@
 
 function TopSellingProducts() {
   const products = [
-    { product: 'Smartphone X', sales: '120 units', inventory: '45 units', status: 'in Stock' },
-    { product: 'Wireless Earbuds', sales: '95 units', inventory: '30 units', status: 'in Stock' },
-    { product: 'Smart Watch', sales: '85 units', inventory: '25 units', status: 'in Stock' },
-    { product: 'Laptop Pro', sales: '70 units', inventory: '15 units', status: 'Low Stock' },
-    { product: 'Bluetooth Speaker', sales: '65 units', inventory: '20 units', status: 'Low Stock' },
+    {
+      product: "Smartphone X",
+      sales: "120 units",
+      inventory: "45 units",
+      status: "in Stock",
+    },
+    {
+      product: "Wireless Earbuds",
+      sales: "95 units",
+      inventory: "30 units",
+      status: "in Stock",
+    },
+    {
+      product: "Smart Watch",
+      sales: "85 units",
+      inventory: "25 units",
+      status: "in Stock",
+    },
+    {
+      product: "Laptop Pro",
+      sales: "70 units",
+      inventory: "15 units",
+      status: "Low Stock",
+    },
+    {
+      product: "Bluetooth Speaker",
+      sales: "65 units",
+      inventory: "20 units",
+      status: "Low Stock",
+    },
   ];
 
-// interface Product {
-//     product: string;
-//     sales: string;
-//     inventory: string;
-//     status: string;
-// }
+  // interface Product {
+  //     product: string;
+  //     sales: string;
+  //     inventory: string;
+  //     status: string;
+  // }
 
-const statusColor = (status: string): string => 
-    status === 'in Stock' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800';
+  const statusColor = (status: string): string =>
+    status === "in Stock"
+      ? "bg-green-100 text-green-800"
+      : "bg-red-100 text-red-800";
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-sm">
@@ -39,7 +66,11 @@ const statusColor = (status: string): string =>
                 <td className="py-4">{item.sales}</td>
                 <td className="py-4">{item.inventory}</td>
                 <td className="py-4">
-                  <span className={`px-3 py-1 rounded-full text-sm ${statusColor(item.status)}`}>
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm ${statusColor(
+                      item.status
+                    )}`}
+                  >
                     {item.status}
                   </span>
                 </td>

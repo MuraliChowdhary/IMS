@@ -1,12 +1,11 @@
-
-import  { useState } from "react";
+import { useState } from "react";
 import { ProcessPayment } from "./ProcessPayment";
 import axios from "axios";
 import { BACKEND_URL } from "../../../Config";
 import { Order } from "./CashierDashboard";
 import { Receipt, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
- 
+
 interface OrderCardProps {
   order: Order;
 }
@@ -18,8 +17,7 @@ export const OrderCard = ({ order }: OrderCardProps) => {
   const [orderId, setOrderID] = useState<string | undefined>(undefined);
   const [amt, setAmount] = useState<number | undefined>(undefined);
 
-    const navigate = useNavigate();
-
+  const navigate = useNavigate();
 
   const calculateTotal = () => {
     if (!order.products || !Array.isArray(order.products)) return 0;
@@ -80,102 +78,101 @@ export const OrderCard = ({ order }: OrderCardProps) => {
   //     alert("Order failed. Please try again.");
   //   }
   // };
-    const _Payment = async function () {
-      try {
-        const productMap = new Map();
-        order?.products?.forEach((p) => {
-          const productId = p.product.id;
-          productMap.set(productId, (productMap.get(productId) || 0) + 1);
-        });
+  const _Payment = async function () {
+    try {
+      const productMap = new Map();
+      order?.products?.forEach((p) => {
+        const productId = p.product.id;
+        productMap.set(productId, (productMap.get(productId) || 0) + 1);
+      });
 
-        const products = Array.from(productMap, ([productId, quantity]) => ({
-          productId,
-          quantity,
-        }));
+      const products = Array.from(productMap, ([productId, quantity]) => ({
+        productId,
+        quantity,
+      }));
 
-        const totalAmount = calculateTotal();
+      const totalAmount = calculateTotal();
 
-        const response = await axios.post(
-          `${BACKEND_URL}/api/cashier/order`,
-          {
-            customerId: order.customerId,
-            products,
-            totalAmount: parseFloat(totalAmount.toFixed(2)),
+      const response = await axios.post(
+        `${BACKEND_URL}/api/cashier/order`,
+        {
+          customerId: order.customerId,
+          products,
+          totalAmount: parseFloat(totalAmount.toFixed(2)),
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
           },
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: "Bearer " + localStorage.getItem("token"),
-            },
-          }
-        );
-
-        if (response.data?.razorpay_order_id && response.data?.amount) {
-          setOrderID(response.data.razorpay_order_id);
-          setAmount(response.data.amount);
-          setShowPayment(true);
         }
-      } catch (error) {
-        console.error("Order failed:", error);
-        alert("Order failed. Please try again.");
-      }
-    };
-    
+      );
 
+      if (response.data?.razorpay_order_id && response.data?.amount) {
+        setOrderID(response.data.razorpay_order_id);
+        setAmount(response.data.amount);
+        setShowPayment(true);
+      }
+    } catch (error) {
+      console.error("Order failed:", error);
+      alert("Order failed. Please try again.");
+    }
+  };
 
   const handleCancel = async (orderId: string) => {
     try {
-      const response = await axios.post(`${BACKEND_URL}/api/cashier/cancelorder`, {
-        orderId: orderId,
-      },
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("token"),
+      const response = await axios.post(
+        `${BACKEND_URL}/api/cashier/cancelorder`,
+        {
+          orderId: orderId,
         },
-    });
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }
+      );
 
-    if(response.status == 201){
+      if (response.status == 201) {
+        alert("Order cancelled successfully");
+        console.log("Order Cancelled successfully");
+        navigate("/cashierDashboard");
+      }
 
-      
-      alert("Order cancelled successfully");
-      console.log("Order Cancelled successfully")
-      navigate("/cashierDashboard")
-    }
-  
       // Handle the response if needed
-      console.log('Order cancelled:', response.data);
+      console.log("Order cancelled:", response.data);
     } catch (err) {
-      console.log('Error cancelling order:', err);
+      console.log("Error cancelling order:", err);
     }
   };
   const handleOrder = (orderId: string) => {
     navigate(`/order/${orderId}`); // Pass it directly
   };
-  
 
   // const navigate = useNavigate();
 
   // useEffect(() => {
   //   if (showPayment && orderId && amt) {
-     
+
   //     navigate('/payment', {
   //       state: { orderId, amount: amt }
   //     });
   //   }
   // }, [showPayment, orderId, amt, navigate]);
-  
 
   console.log("Orders Payments:" + JSON.stringify(order));
 
-  
   return (
     <>
       {showPayment && orderId && amt && (
         <ProcessPayment orderId={orderId} amount={amt} />
       )}
 
-      <div className="max-w-md w-full mx-auto bg-white rounded-lg shadow-lg p-3 cursor-pointer"  onClick={()=>handleOrder(order.id)} >
+      <div
+        className="max-w-md w-full mx-auto bg-white rounded-lg shadow-lg p-3 cursor-pointer"
+        onClick={() => handleOrder(order.id)}
+      >
         <div className="border-b p-4">
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-xl font-bold">Order Receipt</h2>
@@ -198,8 +195,6 @@ export const OrderCard = ({ order }: OrderCardProps) => {
             </p>
           </div>
         </div>
-
-        
 
         {/* <div className="p-4 border-b">
           <div className="flex items-center gap-2 mb-3">
@@ -235,7 +230,6 @@ export const OrderCard = ({ order }: OrderCardProps) => {
           </div>
         </div> */}
 
-        
         <div className="p-4">
           <div className="flex justify-between items-center mb-2">
             <span className="font-medium">Subtotal:</span>
@@ -255,17 +249,18 @@ export const OrderCard = ({ order }: OrderCardProps) => {
 
         <div className="p-4 border-t mb-2 flex space-x-10">
           <button
-            onClick={()=>handleOrder(order.id)}
+            onClick={() => handleOrder(order.id)}
             className="w-full bg-blue-600 hover:bg-blue-800 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 cursor-pointer"
           >
-           view
+            view
           </button>
-          <button onClick={() => handleCancel(order.id)}  className="w-full bg-red-600 hover:bg-red-800 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 cursor-pointer">
+          <button
+            onClick={() => handleCancel(order.id)}
+            className="w-full bg-red-600 hover:bg-red-800 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 cursor-pointer"
+          >
             Cancel order
           </button>
-          <button onClick={_Payment}>
-          </button>
-          
+          <button onClick={_Payment}></button>
         </div>
       </div>
     </>

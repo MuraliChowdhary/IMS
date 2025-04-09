@@ -1,16 +1,21 @@
- 
 interface StatCardProps {
-    title: string;
-    value: string;
-    change: string;
-    icon: string;
-    sinceText: string;
+  title: string;
+  value: string;
+  change: string;
+  icon: string;
+  sinceText: string;
 }
 
-export function StatCard({ title, value, change, icon, sinceText }:StatCardProps) {
-  const isPositive = !change.startsWith('-');
-  const changeColor = isPositive ? 'text-green-600' : 'text-red-600';
-  
+export function StatCard({
+  title,
+  value,
+  change,
+  icon,
+  sinceText,
+}: StatCardProps) {
+  const isPositive = !change.startsWith("-");
+  const changeColor = isPositive ? "text-green-600" : "text-red-600";
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-sm">
       <div className="flex justify-between items-center mb-2">
@@ -19,7 +24,9 @@ export function StatCard({ title, value, change, icon, sinceText }:StatCardProps
       </div>
       <div className="flex items-baseline">
         <h2 className="text-3xl font-bold">{value}</h2>
-        <span className={`ml-2 ${changeColor} text-xs`}>{change} {sinceText}</span>
+        <span className={`ml-2 ${changeColor} text-xs`}>
+          {change} {sinceText}
+        </span>
       </div>
     </div>
   );

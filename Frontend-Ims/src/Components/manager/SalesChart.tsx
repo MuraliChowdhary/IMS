@@ -2,7 +2,7 @@
 
 // function SalesChart() {
 //   const [isVisible, setIsVisible] = useState(false);
-  
+
 //   // Mock data for the chart
 //   const monthlyData = [
 //     { month: 'Jan', amount: 4000 },
@@ -15,13 +15,13 @@
 //   ];
 
 //   const maxAmount = 8000;
-  
+
 //   // Animation effect when component mounts
 //   useEffect(() => {
 //     const timer = setTimeout(() => {
 //       setIsVisible(true);
 //     }, 100);
-    
+
 //     return () => clearTimeout(timer);
 //   }, []);
 
@@ -29,7 +29,7 @@
 //     <div className="bg-white p-6 rounded-lg shadow-sm">
 //       <h2 className="text-xl font-bold">Sales Overview</h2>
 //       <p className="text-gray-500 text-sm mb-6">Monthly sales performance</p>
-      
+
 //       <div className="h-64 relative">
 //         <div className="absolute left-0 top-0 bottom-0 flex flex-col justify-between text-gray-500 text-sm">
 //           <div>8000</div>
@@ -41,9 +41,9 @@
 //         <div className="pl-16 flex items-end h-full">
 //           {monthlyData.map((item, index) => (
 //             <div key={index} className="flex flex-col items-center flex-1">
-//               <div 
+//               <div
 //                 className={`w-4/5 bg-blue-500 rounded-sm transition-all duration-1000 ease-out ${isVisible ? 'opacity-100' : 'opacity-0'}`}
-//                 style={{ 
+//                 style={{
 //                   height: isVisible ? `${(item.amount / maxAmount) * 100}%` : '0%',
 //                   transitionDelay: `${index * 50}ms`
 //                 }}
@@ -60,9 +60,15 @@
 
 // export default SalesChart;
 
-
 //import React from "react";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 import { BarChart3, TrendingUp, Calendar } from "lucide-react";
 
 const data = [
@@ -101,11 +107,26 @@ export function SalesOverview() {
       </div>
 
       <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={data} margin={{ top: 10, right: 20, left: -20, bottom: 5 }}>
-          <YAxis tick={{ fill: "#888" }} tickFormatter={(value) => `$${value}`} domain={[0, 6000]} />
+        <BarChart
+          data={data}
+          margin={{ top: 10, right: 20, left: -20, bottom: 5 }}
+        >
+          <YAxis
+            tick={{ fill: "#888" }}
+            tickFormatter={(value) => `$${value}`}
+            domain={[0, 6000]}
+          />
           <XAxis dataKey="month" tick={{ fill: "#888" }} />
-          <Tooltip formatter={(value) => [`$${value}`, "Sales"]} cursor={{ fill: "transparent" }} />
-          <Bar dataKey="amount" fill="#6572fe" barSize={30} radius={[5, 5, 0, 0]} />
+          <Tooltip
+            formatter={(value) => [`$${value}`, "Sales"]}
+            cursor={{ fill: "transparent" }}
+          />
+          <Bar
+            dataKey="amount"
+            fill="#6572fe"
+            barSize={30}
+            radius={[5, 5, 0, 0]}
+          />
         </BarChart>
       </ResponsiveContainer>
     </div>
