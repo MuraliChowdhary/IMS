@@ -50,11 +50,11 @@ const razorpay = new Razorpay({
 //         const orderProducts = [];
 //         const productIds = products.map((p) => p.productId).filter((id) => id !== undefined);
 //         console.log("Filtered productIds:", productIds);
-        
+
 //         const fetchedProducts = await prisma.product.findMany({
 //             where: { id: { in: productIds } },
 //         });
-        
+
 //         const productMap = new Map(fetchedProducts.map((p) => [p.id, p]));
 
 //         for (const { productId, quantity } of products) {
@@ -140,13 +140,13 @@ export const order = async (req: Request, res: Response) => {
             const product = productMap.get(productId);
 
             if (!product) {
-                 res.status(400).json({ message: `Product with ID ${productId} not found` });
-                 return
+                res.status(400).json({ message: `Product with ID ${productId} not found` });
+                return
             }
 
             if (product.stock < quantity) {
-             res.status(400).json({ message: `Insufficient stock for product ${product.name}` });
-             return
+                res.status(400).json({ message: `Insufficient stock for product ${product.name}` });
+                return
             }
 
             const productTotal = product.price * quantity;
@@ -168,8 +168,8 @@ export const order = async (req: Request, res: Response) => {
         });
 
         if (!existingOrder) {
-             res.status(404).json({ message: `Order with ID ${orderId} not found` });
-             return
+            res.status(404).json({ message: `Order with ID ${orderId} not found` });
+            return
         }
 
         // **Update existing order**
@@ -189,7 +189,7 @@ export const order = async (req: Request, res: Response) => {
             include: { products: true },
         });
 
-         res.status(200).json({
+        res.status(200).json({
             message: "Order updated successfully",
             order: updatedOrder,
         });
@@ -211,7 +211,7 @@ export const processPayment = async (req: Request, res: Response) => {
             razorpay_payment_id,
             razorpay_signature,
         } = req.body;
-            console.log(req.body)
+        console.log(req.body)
         // Comprehensive input validation
         if (!razorpay_payment_id || !razorpay_order_id || !razorpay_signature) {
             res.status(400).json({ message: "Missing payment details" });
@@ -300,11 +300,11 @@ export const processPayment = async (req: Request, res: Response) => {
             const productDetails = await prisma.product.findUnique({
                 where: { id: product.productId },
             });
-        
+
             if (!productDetails) {
                 throw new Error(`Product with ID ${product.productId} not found`);
             }
-        
+
             // Now, check the inventory for the same productId, not just the productId
             const inventory = await prisma.inventory.findFirst({
                 where: {
@@ -317,15 +317,15 @@ export const processPayment = async (req: Request, res: Response) => {
                     price: true
                 }
             });
-            
+
             if (!inventory) {
                 throw new Error(`Inventory record not found for Product ID ${product.productId}`);
             }
-            
+
             if (!inventory) {
                 throw new Error(`Inventory record not found for Product ID ${product.productId}`);
             }
-        
+
             // Parallel transaction and inventory updates
             await Promise.all([
                 prisma.transaction.create({
@@ -343,11 +343,11 @@ export const processPayment = async (req: Request, res: Response) => {
                 }),
             ]);
         });
-        
-        await Promise.all(transactionPromises);
-        
 
-            console.log(updatedOrder)
+        await Promise.all(transactionPromises);
+
+
+        console.log(updatedOrder)
         // Wait for all updates to complete
         await Promise.all(transactionPromises);
 
@@ -440,7 +440,7 @@ export const generateReceipt = async (req: Request, res: Response) => {
         // Order Details
         doc.fontSize(12).text(`Order ID: ${receipt.orderId}`);
         doc.text(`Payment Status: ${receipt.paymentStatus}`);
-        doc.text(`Total Amount: ₹${receipt.totalAmount.toFixed(2)}`);
+        doc.text(`Total Amount: $${receipt.totalAmount.toFixed(2)}`);
         doc.text(`Order Date: ${receipt.createdAt.toDateString()}`);
         doc.moveDown();
 
@@ -448,14 +448,14 @@ export const generateReceipt = async (req: Request, res: Response) => {
         doc.text("Description          Price");
         receipt.products.forEach((product) => {
             doc.text(
-                `${product.name.padEnd(20)} ₹${(product.price * product.quantity).toFixed(2)}`
+                `${product.name.padEnd(20)} $${(product.price * product.quantity).toFixed(2)}`
             );
         });
 
         // Total
         doc.moveDown();
         doc.fontSize(12).text("**************************************");
-        doc.fontSize(14).text(`Total Amount: ₹${receipt.totalAmount.toFixed(2)}`);
+        doc.fontSize(14).text(`Total Amount: $${receipt.totalAmount.toFixed(2)}`);
         doc.fontSize(12).text("**************************************");
 
         // Barcode (Optional)
@@ -513,12 +513,12 @@ export const cancelOrder = async (req: Request, res: Response) => {
             where: { id: orderId },
             include: { products: true }
         })
-        if(!order || order.status === "CANCELLED"){
-            res.status(409).json({message:"Order already Cancelled"})
+        if (!order || order.status === "CANCELLED") {
+            res.status(409).json({ message: "Order already Cancelled" })
             return;
         }
 
-         
+
         const updatedOrder = await prisma.order.update({
             where: { id: orderId },
             data: {
@@ -542,20 +542,20 @@ export const getCustomerOrders = async (req: Request, res: Response) => {
         const orders = await prisma.order.findMany({
             where: {
                 orderType: OrderType.CUSTOMER,
-                status:OrderStatus_new.PENDING,
-                paymentStatus:PaymentStatus.PENDING
+                status: OrderStatus_new.PENDING,
+                paymentStatus: PaymentStatus.PENDING
             },
             select: {
                 id: true,
                 totalAmount: true,
-                paymentStatus:true,
+                paymentStatus: true,
                 customerId: true,
                 products: {
                     select: {
-                        quantity:true,
+                        quantity: true,
                         product: {
                             select: {
-                                id:true,
+                                id: true,
                                 name: true,
                                 price: true,
                                 stock: true,
@@ -569,7 +569,7 @@ export const getCustomerOrders = async (req: Request, res: Response) => {
                         },
                     }
                 },
-                
+
                 customer: {  // Optional: Fetch customer details
                     select: {
                         username: true,

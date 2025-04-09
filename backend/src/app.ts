@@ -16,17 +16,11 @@ import cashierRoutes from "./routes/cashier";
 import authRoutes from "./routes/authRoutes";
 
  
- 
-// Initialize environment variables
 dotenv.config();
  
-// Create Express app
 const app = express();
 
 
-
-
-// Middleware
 app.use(express.json());
 app.use(
   cors({
@@ -40,12 +34,11 @@ app.use(cors());
 app.use(morgan("dev"));
 app.use(helmet());
 
-// Base API Route
 app.get("/", (req: Request, res: Response) => {
   res.status(200).json({ message: "Welcome to the Inventory Management System API!" });
 });
 
-// Routes
+
 app.use("/api/admin", adminRoutes);
 app.use("/api/manager", managerRoutes);
 app.use("/api/sales", salesRoutes);
@@ -65,7 +58,7 @@ app.post("/api/payment-sucess",(req:Request,res:Response)=>{
       res.status(200).json({"Messagr:":responseBody})
 })
 
-// Error handling middleware
+
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   console.error(err.stack);
   res.status(500).json({

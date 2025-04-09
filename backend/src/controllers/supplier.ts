@@ -1,30 +1,30 @@
- 
 
- import { Request, Response,NextFunction } from 'express';
- import { PrismaClient, PaymentStatus, OrderStatus_new,Order,QCStatus, OrderType } from '@prisma/client';
+
+import { Request, Response, NextFunction } from 'express';
+import { PrismaClient, PaymentStatus, OrderStatus_new, Order, QCStatus, OrderType } from '@prisma/client';
 import { order } from './cashier';
- 
- 
+
+
 const prisma = new PrismaClient();
 
 
 
-export const retriveOrders = async (req:Request,res:Response)=>{
-    try{
-        const retriveorder = await prisma.order.findMany({
-            where:{supplierId:req.user?.id}
-        })
-        if(!retriveorder){
-              res.status(404).json({message:"No orders found"})
-              return
-        }
-        res.status(200).json(retriveorder)
+export const retriveOrders = async (req: Request, res: Response) => {
+  try {
+    const retriveorder = await prisma.order.findMany({
+      where: { supplierId: req.user?.id }
+    })
+    if (!retriveorder) {
+      res.status(404).json({ message: "No orders found" })
+      return
     }
-    
-    catch(err){
-        console.log(err);
-        res.status(500).json({error:"Internal server error"})
-    }
+    res.status(200).json(retriveorder)
+  }
+
+  catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Internal server error" })
+  }
 }
 
 
@@ -46,7 +46,7 @@ export const retriveOrders = async (req:Request,res:Response)=>{
 //         console.error(err)
 //         res.status(500).json({error:"Internal server error"})
 //        }
-       
+
 // }
 
 
@@ -137,13 +137,13 @@ export const retriveOrders = async (req:Request,res:Response)=>{
 //     catch(err){
 //         res.status(500).json({message:"Internal Server Error"});
 //     }
-    
+
 //  }
 
 
 
 
- 
+
 
 
 // Supplier reviews and proposes price
@@ -162,8 +162,8 @@ export const proposePriceForOrder = async (req: Request, res: Response) => {
     const formattedDate = new Date(expectedDeliveryDate.split('-').reverse().join('-'));
 
     if (isNaN(formattedDate.getTime())) {
-       res.status(400).json({ error: 'Invalid date format. Use DD-MM-YYYY.' });
-       return
+      res.status(400).json({ error: 'Invalid date format. Use DD-MM-YYYY.' });
+      return
     }
 
     // Update the order with the proposed prices
@@ -206,7 +206,7 @@ export const reviewPriceProposal = async (req: Request, res: Response) => {
 
   try {
     const newStatus = decision === 'APPROVE' ? 'PRICE_APPROVED' : 'PRICE_NEGOTIATING';
-    
+
     const order = await prisma.order.update({
       where: { id: orderId },
       data: {

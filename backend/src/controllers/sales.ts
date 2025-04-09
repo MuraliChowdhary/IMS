@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { OrderStatus_new, PrismaClient } from "@prisma/client";
- 
+
 const prisma = new PrismaClient();
 
 // GET: Sales Overview
@@ -64,29 +64,29 @@ export const getTopProducts = async (req: Request, res: Response) => {
 
 
 export const getOrders = async (req: Request, res: Response) => {
-    try {
-      const { customerId, startDate, endDate, status } = req.query;
-  
-      const parsedStatus = status ? (OrderStatus_new[status as keyof typeof OrderStatus_new] as OrderStatus_new) : undefined;
-  
-      const orders = await prisma.order.findMany({
-        where: {
-          status: parsedStatus,
-          customerId: customerId ? String(customerId) : undefined,
-          createdAt: {
-            gte: startDate ? new Date(startDate as string) : undefined,
-            lte: endDate ? new Date(endDate as string) : undefined,
-          },
+  try {
+    const { customerId, startDate, endDate, status } = req.query;
+
+    const parsedStatus = status ? (OrderStatus_new[status as keyof typeof OrderStatus_new] as OrderStatus_new) : undefined;
+
+    const orders = await prisma.order.findMany({
+      where: {
+        status: parsedStatus,
+        customerId: customerId ? String(customerId) : undefined,
+        createdAt: {
+          gte: startDate ? new Date(startDate as string) : undefined,
+          lte: endDate ? new Date(endDate as string) : undefined,
         },
-        include: { customer: true },
-      });
-  
-      res.json(orders);
-    } catch (err) {
-      console.error(err);
-      res.status(500).json({ error: "Internal Server Error" });
-    }
-  };
+      },
+      include: { customer: true },
+    });
+
+    res.json(orders);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
 
 // GET: Order Details
 export const getOrderById = async (req: Request, res: Response) => {
@@ -96,8 +96,8 @@ export const getOrderById = async (req: Request, res: Response) => {
       include: { customer: true, products: true },
     });
 
-    if (!order)  res.status(404).json({ error: "Order not found" });
-    
+    if (!order) res.status(404).json({ error: "Order not found" });
+
 
     res.json(order);
   } catch (err) {
@@ -150,7 +150,7 @@ export const getSalesByCustomer = async (req: Request, res: Response) => {
 export const getSalesByRegion = async (req: Request, res: Response) => {
   try {
     const salesByRegion = await prisma.order.groupBy({
-      by: ["customerId"],  
+      by: ["customerId"],
       _sum: { totalAmount: true },
     });
 
@@ -176,60 +176,60 @@ export const getPaymentMethods = async (req: Request, res: Response) => {
 
 
 export const lowstock = async (req: Request, res: Response) => {
-    try {
+  try {
 
 
-        const lowStockItems = await prisma.$queryRaw<any[]>`
+    const lowStockItems = await prisma.$queryRaw<any[]>`
             SELECT * FROM "Inventory" 
             WHERE quantity <= threshold
         `;
 
 
-        if (lowStockItems.length === 0) {
-            res.status(404).json({
-                success: false,
-                message: "No low stock items found"
-            });
-            return;
-        }
-
-                         
-        const formattedItems = lowStockItems.map(item => ({
-            id: item.id,
-            name: item.name,
-            currentQuantity: item.quantity,
-            threshold: item.threshold,
-            reorderLevel: item.reorderLevel,
-            needsReorder: item.quantity <= item.reorderLevel,
-            product: {
-                id: item.product.id,
-                name: item.product.name,
-                SKU: item.product.SKU
-            },
-            supplier: item.supplier,
-            lastUpdated: item.updatedAt
-        }));
-
-        res.status(200).json({
-            success: true,
-            data: {
-                items: formattedItems,
-                summary: {
-                    totalLowStock: formattedItems.length,
-                    needingReorder: formattedItems.filter(item => item.needsReorder).length,
-                    criticalItems: formattedItems.filter(item => item.currentQuantity === 0).length
-                }
-            }
-        });
-
-    } catch (error) {
-        console.error('Error fetching low stock items:', error);
-        res.status(500).json({
-            success: false,
-            message: "Internal server error",
-            error: error instanceof Error ? error.message : 'Unknown error occurred'
-        });
+    if (lowStockItems.length === 0) {
+      res.status(404).json({
+        success: false,
+        message: "No low stock items found"
+      });
+      return;
     }
+
+
+    const formattedItems = lowStockItems.map(item => ({
+      id: item.id,
+      name: item.name,
+      currentQuantity: item.quantity,
+      threshold: item.threshold,
+      reorderLevel: item.reorderLevel,
+      needsReorder: item.quantity <= item.reorderLevel,
+      product: {
+        id: item.product.id,
+        name: item.product.name,
+        SKU: item.product.SKU
+      },
+      supplier: item.supplier,
+      lastUpdated: item.updatedAt
+    }));
+
+    res.status(200).json({
+      success: true,
+      data: {
+        items: formattedItems,
+        summary: {
+          totalLowStock: formattedItems.length,
+          needingReorder: formattedItems.filter(item => item.needsReorder).length,
+          criticalItems: formattedItems.filter(item => item.currentQuantity === 0).length
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('Error fetching low stock items:', error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error instanceof Error ? error.message : 'Unknown error occurred'
+    });
+  }
 };
 
 // POST: Create New Order
