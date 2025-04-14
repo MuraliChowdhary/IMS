@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { BACKEND_URL } from "../../../Config";
 import axios from "axios";
-import { Sidebar } from "./Sidebar";
 
 const AddInventory = () => {
   const [error, setError] = useState("");
@@ -61,8 +60,7 @@ const AddInventory = () => {
   // const formattedExpirationDate = new Date(req.body.expirationDate).toISOString();
 
   return (
-    <div className="flex">
-      <Sidebar />
+    <div>
       <div className="max-w-lg mx-auto bg-white p-6 rounded shadow mt-10">
         <h2 className="text-xl font-bold mb-4">Add Inventory</h2>
         <form onSubmit={handleSubmit} className="space-y-4">

@@ -20,7 +20,7 @@ export const SupplierRegister = () => {
     try {
       //username,contact, email,location,password,role
       const response = await axios.post(
-        "https://ims-clxd.onrender.com/api/auth/supplier/register",
+        "http://localhost:5000/api/auth/supplier/register",
         {
           username: name,
           email,

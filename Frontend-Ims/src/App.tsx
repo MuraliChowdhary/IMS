@@ -19,8 +19,13 @@ import { CustomerSales } from "./Components/sales/CustomerSales";
 //import SalesOverview from "./Components/sales/SalesOverview";
 import NewSalesOverview from "./Components/sales/NewSalesOverview";
 import Inventory from "./Components/manager/Inventory";
-import Reorder  from "./Components/manager/Reorder";
+// import Reorder  from "./Components/manager/Reorder";
 import AddInventory from "./Components/manager/AddInventory";
+import LowStock from "./Components/manager/Lowstock";
+import ProductFilters from "./Components/manager/productFilters";
+import { PendingOrderSupplier } from "./Components/manager/pendingOrderSupplier";
+import LowStockWithSidebarPage from "./Components/manager/LowStockWithSidebarPage";
+// import {addBulkProducts} from "./Components/manager/addBulkProducts";
   function App() {
     
     return (
@@ -46,9 +51,15 @@ import AddInventory from "./Components/manager/AddInventory";
               <Route path="/supplier" element={<SupplierDashboard/>}/> 
               <Route path="/supplier/login" element={<SupplierLogin/>}/> 
               <Route path="/supplier/register" element={<SupplierRegister/>}/> 
-              <Route path="/inventory" element={<Inventory/>}/>
-              <Route path="/manager/reorder" element={<Reorder/>}/>
+              <Route path="/manager/inventory" element={<Inventory/>}/>
+              {/* <Route path="/manager/reorder" element={<Reorder/>}/> */}
               <Route path="/manager/addinventory" element={<AddInventory/>}/>
+              <Route path="/manager/lowstocks" element={<LowStock/>}/>
+              <Route path="/manager/productFilter" element = {<ProductFilters/>} />
+              <Route path="/manager/pendingOrder" element = {<PendingOrderSupplier/>} />
+              <Route path="/manager/reorder" element={<LowStockWithSidebarPage/>}/>
+              <Route path="/manager/add" element={<UploadProductCSV />}/>
+              <Route path="/manager/analytics" element={<AnalyticsDashboard />}/>
           </Routes>
         </BrowserRouter>
         </CartProvider>
@@ -78,6 +89,8 @@ import AddInventory from "./Components/manager/AddInventory";
 // import { SupplierRegister } from "./Components/SupplierRegister";
 // import { AuthProvider } from "./Components/AuthContext";
 // import ProtectedRoute from "./Components/ProtectedRoutes";
+import UploadProductCSV from "./Components/manager/UploadProductCSV";
+import AnalyticsDashboard from "./Components/manager/Analtics";
 
 // function App() {
 //   return (

@@ -1,43 +1,4 @@
-// import { Link } from "react-router-dom";
 
-// const Sidebar = () => {
-//   return (
-//     <div className="w-64 bg-white-900 h-screen text-black p-4 opacity-80 shadow-xl">
-
-//       <h2 className="text-xl font-bold mb-4">Manager Dashboard</h2>
-//       <nav className="space-y-2">
-//         <Link to="/inventory" className="block px-3 py-2 rounded hover:bg-gray-400">
-//           Inventory
-//         </Link>
-//         <Link to="/addinventory" className="block px-3 py-2 rounded hover:bg-gray-400">
-//           Add Inventory
-//         </Link>
-//         <Link to="/products" className="block px-3 py-2 rounded hover:bg-gray-400">
-//           Products
-//         </Link>
-//         <Link to="/lowstock" className="block px-3 py-2 rounded hover:bg-gray-400">
-//           Low Stock
-//         </Link>
-//         <Link to="/reorder" className="block px-3 py-2 rounded hover:bg-gray-400">
-//           Reorder
-//         </Link>
-//         <Link to="/pricedecision" className="block px-3 py-2 rounded hover:bg-gray-400">
-//           Price Decision
-//         </Link>
-//         <Link to="/qc" className="block px-3 py-2 rounded hover:bg-gray-400">
-//           Quality Check
-//         </Link>
-//         <Link to="/deliveredConfirmation" className="block px-3 py-2 rounded hover:bg-gray-400">
-//           Delivery Confirmation
-//         </Link>
-//       </nav>
-//     </div>
-//   );
-// };
-
-// export default Sidebar;
-
-// import { Sidebar as LucideSidebar } from 'lucide-react';
 import { useState } from "react";
 
 export function Sidebar() {

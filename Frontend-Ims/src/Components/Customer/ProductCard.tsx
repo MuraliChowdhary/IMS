@@ -2,7 +2,7 @@ import axios from "axios";
 import { useState, useEffect, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Navbar } from "./Navbar";
-import { useCart } from "./CardContext"; // Import Cart context
+import { useCart } from "./CardContext";
 
 interface DiscountInformation {
   discountValue: number;
@@ -17,7 +17,9 @@ interface Product {
   description: string;
   stock: number;
   SKU: string;
-  discountInformation?: DiscountInformation; // Discount is optional now
+  quantity: number;
+  quantityStatus: string;
+  discountInformation?: DiscountInformation;
 }
 
 export const ProductsCard = () => {
@@ -31,7 +33,7 @@ export const ProductsCard = () => {
     async function fetchItem() {
       try {
         const response = await axios.get(
-          `https://ims-clxd.onrender.com/api/customer/products/${id}`,
+          `http://localhost:5000/api/customer/products/${id}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -39,7 +41,6 @@ export const ProductsCard = () => {
             },
           }
         );
-
         setProduct(response.data.product);
       } catch (error) {
         console.error("Error fetching product:", error);
@@ -50,32 +51,20 @@ export const ProductsCard = () => {
 
   const finalPrice = useMemo(() => {
     if (!product) return 0;
-
     const { price, discountInformation } = product;
     if (!discountInformation) return price;
 
-    const { discountValue, discountType } = discountInformation;
-    let calculatedPrice = price;
-
-    if (discountType === "percentage") {
-      calculatedPrice -= (discountValue / 100) * price;
-    } else if (discountType === "fixed") {
-      calculatedPrice -= discountValue;
-    }
-
-    return calculatedPrice;
+    return discountInformation.discountType === "percentage"
+      ? price - (discountInformation.discountValue / 100) * price
+      : price - discountInformation.discountValue;
   }, [product]);
 
   const handleAddToCart = (product: Product) => {
-    if (product) {
-      addToCart(product);
-      setIsAddedToCart(true);
-    }
+    addToCart(product);
+    setIsAddedToCart(true);
   };
 
-  const handleGoToCart = () => {
-    navigate("/cart");
-  };
+  const handleGoToCart = () => navigate("/cart");
 
   if (!product) {
     return (
@@ -91,8 +80,10 @@ export const ProductsCard = () => {
   return (
     <div>
       <Navbar />
-      <div className="flex flex-row justify-center items-center px-10 mt-10">
-        <div className="flex flex-col items-center">
+      <div className="flex flex-col lg:flex-row justify-center items-start gap-10 px-6 py-10">
+        
+        
+        <div className="flex-shrink-0">
           <img
             src={product.imageUrls[0]}
             alt={product.name}
@@ -102,60 +93,53 @@ export const ProductsCard = () => {
           />
         </div>
 
-        <div className="text-center mx-10 flex-grow">
-          <h1 className="text-3xl font-bold">{product.name}</h1>
-          <h3 className="text-lg mt-4 font-semibold">{product.description}</h3>
+       
+        <div className="flex flex-col gap-6 max-w-xl">
+          <h1 className="text-4xl font-bold">{product.name}</h1>
+          <h3 className="text-lg text-gray-700">{product.description}</h3>
 
-          <div className="flex flex-col mt-10">
-            <div className="mb-4 text-lg font-semibold">About:</div>
-            <ul className="list-disc list-inside text-lg text-gray-500">
+          <div>
+            <div className="mb-2 text-lg font-semibold">Product Information:</div>
+            <ul className="list-disc list-inside text-gray-600 space-y-2">
               <li>
-                <span className="text-lg font-semibold text-black">
-                  Description:
-                </span>{" "}
+                <span className="font-medium text-black">Description:</span>{" "}
                 {product.description}
               </li>
               <li>
-                <span className="text-lg font-semibold text-black">
-                  Category:
-                </span>{" "}
-                {product.description}
+                <span className="font-medium text-black">SKU:</span> {product.SKU}
               </li>
-              <li>
-                <span className="text-lg font-semibold text-black">Stock:</span>{" "}
-                {product.stock} available
-              </li>
-              <li>
-                <span className="text-lg font-semibold text-black">SKU:</span>{" "}
-                {product.SKU}
-              </li>
+             
+              {product.quantityStatus === "Low" && (
+                <li className="text-red-600 font-semibold">Out of Stock</li>
+              )}
             </ul>
           </div>
-        </div>
 
-        <div className="flex flex-col items-start">
-          <div className="flex items-center mb-4">
-            <div className="text-green-700 font-semibold text-xl mr-4">
-              Now ${finalPrice.toFixed(2)}
+        <div className="mt-4 flex flex-col gap-3">
+            <div className="flex items-center gap-4 text-xl font-semibold">
+              <span className="text-green-700">Now: ${finalPrice.toFixed(2)}</span>
+              {product.discountInformation && (
+                <span className="line-through text-gray-500">${product.price}</span>
+              )}
             </div>
-            <div className="line-through text-gray-500">${product.price}</div>
-          </div>
 
-          {isAddedToCart ? (
-            <button
-              onClick={handleGoToCart}
-              className="border p-2 rounded bg-green-500 text-white hover:bg-green-600 transition duration-200 w-full"
-            >
-              Go to Cart
-            </button>
-          ) : (
-            <button
-              onClick={() => handleAddToCart(product)}
-              className="border p-2 rounded bg-blue-500 text-white hover:bg-blue-600 transition duration-200 w-full"
-            >
-              Add to Cart
-            </button>
-          )}
+           
+            {isAddedToCart && product.quantityStatus !== "Low" ? (
+              <button
+                onClick={handleGoToCart}
+                className="border p-2 rounded bg-green-500 text-white hover:bg-green-600 transition duration-200 w-full"
+              >
+                Go to Cart
+              </button>
+            ) : product.quantityStatus !== "Low" ? (
+              <button
+                onClick={() => handleAddToCart(product)}
+                className="border p-2 rounded bg-blue-500 text-white hover:bg-blue-600 transition duration-200 w-full"
+              >
+                Add to Cart
+              </button>
+            ) : null}
+          </div>
         </div>
       </div>
     </div>

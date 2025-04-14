@@ -23,7 +23,7 @@ const SalesOverview = () => {
     const fetchSalesData = async () => {
       try {
         const response = await axios.get(
-          "https://ims-clxd.onrender.com/api/sales/overview",
+          "http://localhost:5000/api/sales/overview",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
