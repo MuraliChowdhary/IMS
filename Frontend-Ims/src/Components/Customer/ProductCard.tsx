@@ -33,7 +33,7 @@ export const ProductsCard = () => {
     async function fetchItem() {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/customer/products/${id}`,
+          `https://ims-clxd.onrender.com/api/customer/products/${id}`,
           {
             headers: {
               "Content-Type": "application/json",
@@ -81,8 +81,6 @@ export const ProductsCard = () => {
     <div>
       <Navbar />
       <div className="flex flex-col lg:flex-row justify-center items-start gap-10 px-6 py-10">
-        
-        
         <div className="flex-shrink-0">
           <img
             src={product.imageUrls[0]}
@@ -93,37 +91,42 @@ export const ProductsCard = () => {
           />
         </div>
 
-       
         <div className="flex flex-col gap-6 max-w-xl">
           <h1 className="text-4xl font-bold">{product.name}</h1>
           <h3 className="text-lg text-gray-700">{product.description}</h3>
 
           <div>
-            <div className="mb-2 text-lg font-semibold">Product Information:</div>
+            <div className="mb-2 text-lg font-semibold">
+              Product Information:
+            </div>
             <ul className="list-disc list-inside text-gray-600 space-y-2">
               <li>
                 <span className="font-medium text-black">Description:</span>{" "}
                 {product.description}
               </li>
               <li>
-                <span className="font-medium text-black">SKU:</span> {product.SKU}
+                <span className="font-medium text-black">SKU:</span>{" "}
+                {product.SKU}
               </li>
-             
+
               {product.quantityStatus === "Low" && (
                 <li className="text-red-600 font-semibold">Out of Stock</li>
               )}
             </ul>
           </div>
 
-        <div className="mt-4 flex flex-col gap-3">
+          <div className="mt-4 flex flex-col gap-3">
             <div className="flex items-center gap-4 text-xl font-semibold">
-              <span className="text-green-700">Now: ${finalPrice.toFixed(2)}</span>
+              <span className="text-green-700">
+                Now: ${finalPrice.toFixed(2)}
+              </span>
               {product.discountInformation && (
-                <span className="line-through text-gray-500">${product.price}</span>
+                <span className="line-through text-gray-500">
+                  ${product.price}
+                </span>
               )}
             </div>
 
-           
             {isAddedToCart && product.quantityStatus !== "Low" ? (
               <button
                 onClick={handleGoToCart}

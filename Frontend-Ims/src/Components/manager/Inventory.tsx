@@ -33,7 +33,7 @@
 //     data = {} as FetchResponse,
 //     loading,
 //     error,
-//   } = useFetch("http://localhost:5000/api/manager/inventory");
+//   } = useFetch("https://ims-clxd.onrender.com/api/manager/inventory");
 
 //   const inventory: InventoryProp[] = Array.isArray(data?.inventory)
 //     ? data.inventory
@@ -125,7 +125,7 @@
 
 // export default Inventory;
 
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -133,49 +133,54 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "../ui/card"
+} from "../ui/card";
 
-import axios from "axios"
-import { Boxes } from "lucide-react"
+import axios from "axios";
+import { Boxes } from "lucide-react";
 
 export default function CurrentInventory() {
-  const [value, setValue] = useState(0)
+  const [value, setValue] = useState(0);
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await axios.get("http://localhost:5000/api/manager/inventory/currentInventoryValue", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        })
-        console.log(response.data)
-        setValue(response.data.totalItems)
+        const response = await axios.get(
+          "https://ims-clxd.onrender.com/api/manager/inventory/currentInventoryValue",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        console.log(response.data);
+        setValue(response.data.totalItems);
       } catch (error) {
-        console.error("Failed to fetch inventory value:", error)
+        console.error("Failed to fetch inventory value:", error);
       }
     }
-    fetchData()
-  }, [])
+    fetchData();
+  }, []);
 
   return (
-   
-          <Card className="shadow-lg rounded-2xl border border-gray-200 bg-white transition-transform hover:scale-[1.01] duration-200">
-            <CardHeader className="flex items-center gap-3">
-              <Boxes className="text-blue-600 w-6 h-6" />
-              <div>
-                <CardTitle className="text-xl font-semibold">Current Inventory</CardTitle>
-                <CardDescription className="text-gray-500">Total items tracked in the system</CardDescription>
-              </div>
-            </CardHeader>
-            <CardContent className="py-6 text-center">
-              <p className="text-4xl font-bold text-blue-700">{value}</p>
-              <p className="mt-2 text-sm text-gray-500">products in stock</p>
-            </CardContent>
-            <CardFooter className="justify-end text-xs text-gray-400">
-              Last updated: just now
-            </CardFooter>
-          </Card>
-        
-  )
+    <Card className="shadow-lg rounded-2xl border border-gray-200 bg-white transition-transform hover:scale-[1.01] duration-200">
+      <CardHeader className="flex items-center gap-3">
+        <Boxes className="text-blue-600 w-6 h-6" />
+        <div>
+          <CardTitle className="text-xl font-semibold">
+            Current Inventory
+          </CardTitle>
+          <CardDescription className="text-gray-500">
+            Total items tracked in the system
+          </CardDescription>
+        </div>
+      </CardHeader>
+      <CardContent className="py-6 text-center">
+        <p className="text-4xl font-bold text-blue-700">{value}</p>
+        <p className="mt-2 text-sm text-gray-500">products in stock</p>
+      </CardContent>
+      <CardFooter className="justify-end text-xs text-gray-400">
+        Last updated: just now
+      </CardFooter>
+    </Card>
+  );
 }

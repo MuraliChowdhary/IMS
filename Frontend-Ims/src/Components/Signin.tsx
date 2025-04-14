@@ -13,7 +13,7 @@
 //     }
 //     const handleSubmit =async()=>{
 //        try{
-//         const response  = await axios.post('http://localhost:5000auth/login', {
+//         const response  = await axios.post('https://ims-clxd.onrender.comauth/login', {
 //             email:email,
 //             password:password
 
@@ -137,7 +137,7 @@ export const Signin = () => {
     setLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
+        "https://ims-clxd.onrender.com/api/auth/login",
         {
           email,
           password,

@@ -1,13 +1,8 @@
 "use client";
 
-import  { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import {
-  Card,
-  CardHeader,
-  CardContent,
-  CardTitle,
-} from "../ui/card";
+import { Card, CardHeader, CardContent, CardTitle } from "../ui/card";
 import { Badge } from "../ui/badge";
 import { Skeleton } from "../ui/skeleton";
 import { ScrollArea } from "../ui/scroll-area";
@@ -46,7 +41,8 @@ export const PendingOrderSupplier = () => {
     const fetchOrders = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:5000/api/manager/pendingStoreOrdersBySupplier",{
+          "https://ims-clxd.onrender.com/api/manager/pendingStoreOrdersBySupplier",
+          {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
@@ -98,8 +94,12 @@ export const PendingOrderSupplier = () => {
           <CardContent>
             <div className="mb-2">
               <p className="font-semibold text-sm">Supplier:</p>
-              <p>{order.supplier.name} ({order.supplier.email})</p>
-              <p>{order.supplier.contact} | {order.supplier.location}</p>
+              <p>
+                {order.supplier.name} ({order.supplier.email})
+              </p>
+              <p>
+                {order.supplier.contact} | {order.supplier.location}
+              </p>
             </div>
 
             <div className="mt-2">
@@ -112,8 +112,9 @@ export const PendingOrderSupplier = () => {
                   >
                     <span>Product ID: {product.productId}</span>
                     <span>
-                      Qty: {product.quantity} | ₹{product.proposedPrice.toFixed(2)}{" "}
-                      | <Badge>{product.negotiationStatus}</Badge>
+                      Qty: {product.quantity} | ₹
+                      {product.proposedPrice.toFixed(2)} |{" "}
+                      <Badge>{product.negotiationStatus}</Badge>
                     </span>
                   </li>
                 ))}
