@@ -22,15 +22,16 @@ const app = express();
 
 
 app.use(express.json());
-app.use(
-  cors({
-    origin: 'https://inventorysolutions.vercel.app',  // removed the comma ✅
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true,
-  })
-);
-app.options('*', cors());
+const corsOptions = {
+  origin:   ['https://inventorysolutions.vercel.app','http://localhost:5000'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions)); // preflight handled properly
+
 app.use(morgan("dev"));
 app.use(helmet());
 
