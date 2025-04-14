@@ -402,7 +402,7 @@ export const lowstock = async (req: Request, res: Response) => {
  
  //need to add the perishable & another parameters
  
- 
+
  
  
  export const checkInventoryLevels = async (req: Request, res: Response): Promise<void> => {
@@ -776,10 +776,224 @@ export const markOrderAsDelivered = async (req: Request, res: Response) => {
 };
 
 
+ 
+export const getCurrentInventoryValue = async (req: Request, res: Response) => {
+  try {
+    const itemCount = await prisma.inventory.count()
+
+     res.status(200).json({
+      success: true,
+      totalItems: itemCount,
+      message: "Current inventory count retrieved successfully"
+    })
+    return
+  } catch (error) {
+    console.error("Error getting current inventory value:", error)
+     res.status(500).json({
+      success: false,
+      message: "Something went wrong while fetching inventory count"
+    })
+    return
+  }
+}
 
 
 
+export const pendingSupplierOrders = async (req: Request, res: Response) => {
+  try {
+    const pendingOrders = await prisma.order.findMany({
+      where: {
+        orderType: 'SUPPLIER',
+        status: 'PENDING',
+      },
+      include: {
+        products: true,
+        supplier: true,
+      },
+    });
 
+    res.status(200).json({ pendingOrders });
+  } catch (error) {
+    console.error('Error fetching pending supplier orders:', error);
+    res.status(500).json({ error: 'Failed to fetch pending supplier orders' });
+  }
+}
+export const pendingStoreOrdersBySupplier = async (req: Request, res: Response) => {
+  try {
+    const pendingOrders = await prisma.order.findMany({
+      where: {
+        orderType: 'SYSTEM',
+        status: 'REORDER_REQUESTED',
+      },
+      include: {
+        products: true,
+        supplier: true,
+      },
+    });
+
+    res.status(200).json({ pendingOrders });
+  } catch (error) {
+    console.error('Error fetching pending supplier orders:', error);
+    res.status(500).json({ error: 'Failed to fetch pending supplier orders' });
+  }
+}
+
+export const getProductsWithFilters = async (req: Request, res: Response) => {
+  try {
+    const {
+      search,
+      category,
+      stockLevel,
+      supplier,
+      isPerishable,
+      sortBy,
+      page = 1,
+      limit = 10
+    } = req.query;
+
+    const skip = (Number(page) - 1) * Number(limit);
+    const take = Number(limit);
+
+    // Base where clause
+    const where: any = {};
+
+    // Search filter
+    if (search) {
+      where.OR = [
+        { name: { contains: search as string, mode: 'insensitive' } },
+        { SKU: { contains: search as string, mode: 'insensitive' } },
+        { description: { contains: search as string, mode: 'insensitive' } }
+      ];
+    }
+
+    // Category filter
+    if (category) {
+      where.category = category as string;
+    }
+
+    // Supplier filter
+    if (supplier) {
+      where.supplierId = supplier as string;
+    }
+
+    // Perishable filter
+    if (isPerishable) {
+      where.isPerishable = isPerishable === 'true';
+    }
+
+    // Stock level filter - modified to work correctly
+    if (stockLevel) {
+      where.inventories = {
+        some: {
+          quantity: {
+            // First get all products that have at least one inventory
+            not: undefined // This ensures the product has an inventory
+          }
+        }
+      };
+
+      // Now add the specific stock level conditions
+      const inventoryWhere: any = {};
+      
+      switch (stockLevel) {
+        case 'low':
+          inventoryWhere.quantity = {
+            lte: prisma.inventory.fields.reorderLevel
+          };
+          break;
+        case 'medium':
+          inventoryWhere.quantity = {
+            gt: prisma.inventory.fields.reorderLevel,
+            lte: 2 * (prisma.inventory.fields.reorderLevel as unknown as number)
+          };
+          break;
+        case 'high':
+          inventoryWhere.quantity = {
+            gt: 2 * (prisma.inventory.fields.reorderLevel as unknown as number)
+          };
+          break;
+      }
+
+      // Add the specific condition to the inventory filter
+      where.inventories.some = {
+        ...where.inventories.some,
+        ...inventoryWhere
+      };
+    }
+
+    // Sorting
+    const orderBy: any = {};
+    if (sortBy) {
+      const [field, direction] = (sortBy as string).split(':');
+      orderBy[field] = direction === 'desc' ? 'desc' : 'asc';
+    } else {
+      orderBy.name = 'asc';
+    }
+
+    // Fetch products with relations and count
+    const [products, totalCount] = await Promise.all([
+      prisma.product.findMany({
+        where,
+        include: {
+          supplier: {
+            select: {
+              id: true,
+              name: true
+            }
+          },
+          inventories: true
+        },
+        orderBy,
+        skip,
+        take
+      }),
+      prisma.product.count({ where })
+    ]);
+
+    // Add stock status to each product
+    const productsWithStatus = products.map(product => {
+      const inventory = product.inventories[0];
+      let stockStatus = 'unknown';
+      let statusColor = 'gray';
+
+      if (inventory) {
+        const qty = inventory.quantity;
+        const reorder = inventory.reorderLevel;
+
+        if (qty <= reorder) {
+          stockStatus = 'low';
+          statusColor = 'red';
+        } else if (qty <= reorder * 2) {
+          stockStatus = 'medium';
+          statusColor = 'yellow';
+        } else {
+          stockStatus = 'high';
+          statusColor = 'green';
+        }
+      }
+
+      return {
+        ...product,
+        stockStatus,
+        statusColor
+      };
+    });
+
+    res.json({
+      products: productsWithStatus,
+      pagination: {
+        total: totalCount,
+        pages: Math.ceil(totalCount / take),
+        currentPage: Number(page),
+        limit: take
+      }
+    });
+
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    res.status(500).json({ error: "Failed to fetch products" });
+  }
+};
 
 
 

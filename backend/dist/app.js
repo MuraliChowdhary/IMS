@@ -17,15 +17,13 @@ const supplier_1 = __importDefault(require("./routes/supplier"));
 const customer_1 = __importDefault(require("./routes/customer"));
 const cashier_1 = __importDefault(require("./routes/cashier"));
 const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
-// Initialize environment variables
 dotenv_1.default.config();
-// Create Express app
 const app = (0, express_1.default)();
-// Middleware
 app.use(express_1.default.json());
+app.use((0, cors_1.default)());
 // app.use(
 //   cors({
-//     origin: 'https://inventorysolutions.vercel.app',  
+//     origin: 'https://inventorysolutions.vercel.app,',  
 //     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],  
 //     allowedHeaders: ['Content-Type', 'Authorization'], 
 //     credentials: true,  
@@ -34,11 +32,9 @@ app.use(express_1.default.json());
 app.use((0, cors_1.default)());
 app.use((0, morgan_1.default)("dev"));
 app.use((0, helmet_1.default)());
-// Base API Route
 app.get("/", (req, res) => {
     res.status(200).json({ message: "Welcome to the Inventory Management System API!" });
 });
-// Routes
 app.use("/api/admin", admin_1.default);
 app.use("/api/manager", manager_1.default);
 app.use("/api/sales", sales_1.default);
@@ -54,7 +50,6 @@ app.post("/api/payment-sucess", (req, res) => {
     console.log(responseBody);
     res.status(200).json({ "Messagr:": responseBody });
 });
-// Error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
     res.status(500).json({

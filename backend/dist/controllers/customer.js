@@ -24,14 +24,33 @@ const products = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.products = products;
 const getItemById = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b, _c, _d, _e, _f;
     const id = req.params.id;
     try {
-        const product = yield prisma.product.findUnique({ where: { id: id } });
-        console.log(product);
-        res.status(200).json({ product: product });
+        const product = yield prisma.product.findUnique({
+            where: {
+                id: id,
+            },
+            include: {
+                inventories: true
+            }
+        });
+        if (!product) {
+            res.status(404).json({ message: "Product not found" });
+            return;
+        }
+        // Extract quantity from first inventory item (if it exists)
+        const quantity = (_c = (_b = (_a = product.inventories) === null || _a === void 0 ? void 0 : _a[0]) === null || _b === void 0 ? void 0 : _b.quantity) !== null && _c !== void 0 ? _c : 0;
+        const threshold = (_f = (_e = (_d = product.inventories) === null || _d === void 0 ? void 0 : _d[0]) === null || _e === void 0 ? void 0 : _e.threshold) !== null && _f !== void 0 ? _f : 0;
+        const quantityStatus = quantity < threshold ? "Low" : "Sufficient";
+        // You can also include this in the response if needed
+        res.status(200).json({
+            product: Object.assign(Object.assign({}, product), { quantity,
+                quantityStatus })
+        });
     }
     catch (err) {
-        console.log(err);
+        console.error(err);
         res.status(500).json({ message: "Internal Server Error" });
     }
 });

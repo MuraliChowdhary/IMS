@@ -16,19 +16,46 @@ export const products = async (req: Request, res: Response) => {
 
 
 }
+ 
 
+ 
 export const getItemById = async (req: Request, res: Response) => {
     const id = req.params.id;
+
     try {
-        const product = await prisma.product.findUnique({where:{id:id}});
-        console.log(product)
-        res.status(200).json({ product : product })
+        const product = await prisma.product.findUnique({
+            where: {
+                id: id,
+            },
+            include: {
+                inventories: true
+            }
+        });
+
+        if (!product) {
+             res.status(404).json({ message: "Product not found" });
+             return
+        }
+
+        // Extract quantity from first inventory item (if it exists)
+        const quantity = product.inventories?.[0]?.quantity ?? 0;
+        const threshold= product.inventories?.[0]?.threshold ?? 0;
+        const quantityStatus = quantity < threshold ? "Low" : "Sufficient";
+
+        // You can also include this in the response if needed
+        res.status(200).json({ 
+            product: {
+                ...product,
+                quantity,
+                quantityStatus,
+            }
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Internal Server Error" });
     }
-    catch (err) {
-        console.log(err);
-        res.status(500).json({ message: "Internal Server Error" })
-    }
-}
+};
+
 
 
 
