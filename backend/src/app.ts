@@ -22,15 +22,15 @@ const app = express();
 
 
 app.use(express.json());
-// app.use(cors())
 app.use(
   cors({
-    origin: 'https://inventorysolutions.vercel.app,',  
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],  
-    allowedHeaders: ['Content-Type', 'Authorization'], 
-    credentials: true,  
+    origin: 'https://inventorysolutions.vercel.app',  // removed the comma ✅
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
   })
 );
+
 app.use(cors());
 app.use(morgan("dev"));
 app.use(helmet());
