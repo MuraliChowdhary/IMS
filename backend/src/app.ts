@@ -31,7 +31,6 @@ app.use(
   })
 );
 
-app.use(cors());
 app.use(morgan("dev"));
 app.use(helmet());
 
