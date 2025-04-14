@@ -136,6 +136,7 @@ export const Signin = () => {
     }
     setLoading(true);
     try {
+      console.log("email", email);
       const response = await axios.post(
         "https://ims-clxd.onrender.com/api/auth/login",
         {
