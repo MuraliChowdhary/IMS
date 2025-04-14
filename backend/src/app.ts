@@ -30,7 +30,7 @@ app.use(
     credentials: true,
   })
 );
-
+app.options('*', cors());
 app.use(morgan("dev"));
 app.use(helmet());
 
