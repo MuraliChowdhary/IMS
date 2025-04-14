@@ -20,17 +20,37 @@ dotenv.config();
  
 const app = express();
 
-
 app.use(express.json());
-const corsOptions = {
-  origin:   ['https://inventorysolutions.vercel.app','http://localhost:5000'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
+const corsMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  const allowedOrigins = [
+    'https://inventorysolutions.vercel.app', 
+    'http://localhost:5173'
+  ];
+  
+  const origin = req.headers.origin;
+
+  // Set Access-Control-Allow-Origin if origin is allowed
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+  }
+
+  // Set other CORS headers
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+     res.status(200).end();
+     return
+  }
+
+   next();
+   return
 };
 
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // preflight handled properly
+// Apply the middleware
+app.use(corsMiddleware);
 
 app.use(morgan("dev"));
 app.use(helmet());
