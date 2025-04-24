@@ -9,7 +9,7 @@ export const LandingPage = () => {
       <header className="w-full">
         <LandingPage2 />
       </header>
-      <main className="absolute flex flex-col items-center justify-center w-full h-screen bg-black  mt-10">
+      <main className="absolute flex flex-col items-center justify-center w-full h-screen bg-black  mt-20">
         <HeroSectionOne />
       </main>
     </div>

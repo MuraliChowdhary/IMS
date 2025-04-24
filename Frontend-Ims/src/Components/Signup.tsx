@@ -18,7 +18,7 @@ export const Signup = () => {
   const handleSubmit = async () => {
     try {
       const response = await axios.post(
-        "https://ims-clxd.onrender.com/api/auth/register",
+        "http://localhost:5000/api/auth/register",
         {
           username: name,
           email,

@@ -87,13 +87,13 @@ export const ProcessPayment: React.FC<ProcessPaymentProps> = ({
       amount: amount * 100, // Convert to paise (1 INR = 100 paise)
       currency: "INR",
       order_id: orderId, // Order ID passed as prop
-      name: "Your Company Name", // Your company or website name
+      name: "Primemart", // Your company or website name
       description: "Order Payment", // Payment description
       handler: async (response: RazorpayResponse) => {
         try {
           // Send payment details to your backend for verification
           const result = await fetch(
-            "https://ims-clxd.onrender.com/api/cashier/process-payment",
+            "http://localhost:5000/api/cashier/process-payment",
             {
               method: "POST",
               headers: {
@@ -126,9 +126,9 @@ export const ProcessPayment: React.FC<ProcessPaymentProps> = ({
         }
       },
       prefill: {
-        name: "Your Name", // Prefill customer details
-        email: "your-email@example.com",
-        contact: "9999999999",
+        name: "Abdul Nazeeb", // Prefill customer details
+        email: "abdul@gmail.com",
+        contact: "9285555222",
       },
       theme: {
         color: "#3399cc", // Customize the payment button color

@@ -25,6 +25,7 @@ import LowStock from "./Components/manager/Lowstock";
 import ProductFilters from "./Components/manager/productFilters";
 import { PendingOrderSupplier } from "./Components/manager/pendingOrderSupplier";
 import LowStockWithSidebarPage from "./Components/manager/LowStockWithSidebarPage";
+// import { Toaster } from "sonner";
 // import {addBulkProducts} from "./Components/manager/addBulkProducts";
   function App() {
     
@@ -60,6 +61,9 @@ import LowStockWithSidebarPage from "./Components/manager/LowStockWithSidebarPag
               <Route path="/manager/reorder" element={<LowStockWithSidebarPage/>}/>
               <Route path="/manager/add" element={<UploadProductCSV />}/>
               <Route path="/manager/analytics" element={<AnalyticsDashboard />}/>
+              <Route path="/manager/expiry" element={<ExpiryDiscountDashboard/>}/>
+              <Route path="/manager/ml" element={<MLDashboard/>}/>
+              {/* <Toaster position="top-right" richColors /> */}
           </Routes>
         </BrowserRouter>
         </CartProvider>
@@ -91,6 +95,8 @@ import LowStockWithSidebarPage from "./Components/manager/LowStockWithSidebarPag
 // import ProtectedRoute from "./Components/ProtectedRoutes";
 import UploadProductCSV from "./Components/manager/UploadProductCSV";
 import AnalyticsDashboard from "./Components/manager/Analtics";
+import ExpiryDiscountDashboard from "./Components/manager/ExpiryDiscount";
+import MLDashboard from "./Components/manager/MlCode";
 
 // function App() {
 //   return (

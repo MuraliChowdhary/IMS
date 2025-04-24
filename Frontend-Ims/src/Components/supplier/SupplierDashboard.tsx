@@ -1,5 +1,6 @@
 // pages/SupplierDashboard.jsx
 // import React from 'react';
+
 import MetricCard from './MetricCard';
 import OrdersTable from './OrderTable';
 import Sidebar from './Sidebar';
@@ -12,6 +13,8 @@ function SupplierDashboard() {
     { title: "In Production", value: "18", change: "+3 in progress", icon: "🏭" },
     { title: "Shipped Orders", value: "15", change: "+10% from last month", icon: "🚚" },
   ];
+
+   
 
   return (
     <div className="flex h-screen bg-gray-100">

@@ -9,6 +9,18 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
+
+// import { motion } from "framer-motion";
+import {
+  BarChart,
+  Bell,
+  Building,
+  ClipboardList,
+  LineChart,
+  Barcode,
+} from "lucide-react";
+// import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+
 import {
   Accordion,
   AccordionContent,
@@ -17,58 +29,53 @@ import {
 } from "./ui/accordion";
 
 import { CheckCircle } from "lucide-react";
-import {DialogDemo} from "./Contact";
+import {SupportDialog} from "./Contact";
 import { ROICalculator } from "./ROICal";
 
 // Key Features Section with visualization
+
 export const KeyFeaturesSection = () => {
   const features = [
     {
       title: "Real-time Tracking",
-      description:
-        "Monitor inventory levels and movements across locations in real-time",
-      icon: "chart-line",
+      description: "Monitor inventory levels and movements across locations in real-time",
+      icon: LineChart,
       color: "#4D90FE",
     },
     {
       title: "Barcode Integration",
-      description:
-        "Scan, create and print barcodes for seamless inventory management",
-      icon: "barcode",
+      description: "Scan, create and print barcodes for seamless inventory management",
+      icon: Barcode,
       color: "#4D90FE",
     },
     {
       title: "Smart Analytics",
-      description:
-        "Gain actionable insights with comprehensive inventory reports and forecasts",
-      icon: "chart-bar",
+      description: "Gain actionable insights with comprehensive inventory reports and forecasts",
+      icon: BarChart,
       color: "#00C853",
     },
     {
       title: "Automated Alerts",
-      description:
-        "Get instant notifications for low stock, expiring items, and order status changes",
-      icon: "bell",
+      description: "Get instant notifications for low stock, expiring items, and order status changes",
+      icon: Bell,
       color: "#4D90FE",
     },
     {
       title: "Multi-location Support",
-      description:
-        "Manage inventory across multiple warehouses and retail locations",
-      icon: "building",
+      description: "Manage inventory across multiple warehouses and retail locations",
+      icon: Building,
       color: "#00C853",
     },
     {
       title: "Order Management",
-      description:
-        "Create and track purchase orders with automated reordering capabilities",
-      icon: "clipboard-list",
+      description: "Create and track purchase orders with automated reordering capabilities",
+      icon: ClipboardList,
       color: "#4D90FE",
     },
   ];
 
   return (
-    <section className="py-16 bg-[#121212] w-full px-4">
+    <section className="py-30 bg-black w-full px-4">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -81,43 +88,44 @@ export const KeyFeaturesSection = () => {
             Powerful Features for Complete Control
           </h2>
           <p className="text-[#ABABAB] max-w-3xl mx-auto text-lg">
-            Our inventory management system provides all the tools you need to
-            streamline operations and boost productivity.
+            Our inventory management system provides all the tools you need to streamline operations and boost productivity.
           </p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((feature, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-            >
-              <Card className="bg-[#1E1E1E] border-gray-800 h-full">
-                <CardHeader>
-                  <div
-                    className="rounded-full w-12 h-12 flex items-center justify-center mb-4"
-                    style={{ backgroundColor: `${feature.color}20` }}
-                  >
-                    <span className={`text-${feature.color} text-xl`}>
-                      <i className={`fas fa-${feature.icon}`}></i>
-                    </span>
-                  </div>
-                  <CardTitle className="text-white">{feature.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-[#ABABAB]">{feature.description}</p>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
+          {features.map((feature, index) => {
+            const IconComponent = feature.icon;
+            return (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.1 }}
+              >
+                <Card className="bg-[#1E1E1E] border border-gray-800 h-full">
+                  <CardHeader>
+                    <div
+                      className="rounded-full w-12 h-12 flex items-center justify-center mb-4"
+                      style={{ backgroundColor: `${feature.color}20` }}
+                    >
+                      <IconComponent className="w-6 h-6" color={feature.color} />
+                    </div>
+                    <CardTitle className="text-white">{feature.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-[#ABABAB]">{feature.description}</p>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            );
+          })}
         </div>
       </div>
     </section>
   );
 };
+
 
 // Benefits & Value Proposition Section
 export const BenefitsSection = () => {
@@ -153,7 +161,7 @@ export const BenefitsSection = () => {
   ];
 
   return (
-    <section className="py-16 bg-[#121212] w-full px-4 border-t border-gray-800">
+    <section className="py-16 bg-black w-full px-4  border-gray-800">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -253,7 +261,7 @@ export const BenefitsSection = () => {
 // Use Cases & Industry Applications Section
 export const UseCasesSection = () => {
   return (
-    <section className="py-16 bg-[#121212] w-full px-4 border-t border-gray-800">
+    <section className="py-16 bg-black w-full px-4  border-gray-800">
       <div className="max-w-7xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -360,7 +368,7 @@ export const UseCasesSection = () => {
                       Learn More About Retail Solutions
                     </button>
                   </div>
-                  <div className="bg-[#121212] p-6 rounded-lg border border-gray-800">
+                  <div className="bg-[#121212] p-6 rounded-lg  border-gray-800">
                     <div className="text-lg font-medium text-white mb-4">
                       Case Study: Metro Retailer
                     </div>
@@ -438,7 +446,7 @@ export const IntegrationSecuritySection = () => {
 //   ];
 
   return (
-    <section className="py-16 bg-[#121212] w-full px-4 border-t border-gray-800">
+    <section className="py-16 bg-black w-full px-4  border-gray-800">
       <div className="max-w-7xl mx-auto">
         <div className="grid md:grid-cols-2 gap-16">
           {/* Integrations Section */}
@@ -475,12 +483,29 @@ export const IntegrationSecuritySection = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="bg-[#121212] p-4 rounded-lg border border-gray-800 font-mono text-sm text-[#ABABAB]">
-                  <pre>
-                    {`GET /api/v1/inventory/items\nAUTH: Bearer {api_key}\n\n// Response\n{\n  "items": [...],\n  "total": 247,\n  "page": 1\n}`}
-                  </pre>
-                </div>
-              </CardContent>
+  <div className="bg-[#121212] p-4 rounded-lg border-gray-800 font-mono text-sm text-[#ABABAB]">
+    <pre>
+      {`GET /api/v1/inventory/items
+AUTH: Bearer {api_key}
+
+// Response
+{
+  "inventory": [
+    {
+      "id": "cm7byes410003v1d4axtveexc",
+      "name": "Oneplus",
+      "category": "Mobile",
+      "quantity": 1,
+      "price": 39000,
+      "reorderLevel": 10,
+      "isDemand": "LOW"
+    }
+  ]
+}`}
+    </pre>
+  </div>
+</CardContent>
+
             </Card>
           </motion.div>
 
@@ -651,7 +676,7 @@ export const IntegrationSecuritySection = () => {
 // FAQ Section
 export const FAQSection = () => {
   return (
-    <section className="py-16 bg-[#121212] w-full px-4 border-t border-gray-800">
+    <section className="py-16 bg-black w-full px-4  border-gray-800">
       <div className="max-w-4xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -759,7 +784,7 @@ export const FAQSection = () => {
           <p className="text-[#ABABAB] mb-6">
             Still have questions? Our team is ready to help.
           </p>
-          <DialogDemo/>
+          <SupportDialog/>
         </motion.div>
       </div>
     </section>

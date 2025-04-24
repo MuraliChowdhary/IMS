@@ -8,6 +8,7 @@ import { PendingOrderSupplier } from './pendingOrderSupplier';
 import UploadProductCSV from './UploadProductCSV';
 import { SidebarProvider, SidebarTrigger } from '../ui/sidebar';
 import AppSidebar from './app-sidebar';
+import ExpiryDiscountDashboard from './ExpiryDiscount';
 
 const ManagerOverview = () => {
   return (
@@ -60,6 +61,11 @@ const ManagerOverview = () => {
             <section className="bg-white p-4 rounded-xl shadow-md">
               <h2 className="text-xl font-semibold mb-2">Upload Products via CSV</h2>
               <UploadProductCSV />
+            </section>
+
+            <section className="bg-white p-4 rounded-xl shadow-md">
+              <h2 className="text-xl font-semibold mb-2">Expiry and Discounts</h2>
+              <ExpiryDiscountDashboard />
             </section>
 
            

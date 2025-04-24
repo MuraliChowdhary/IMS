@@ -11,7 +11,7 @@ export const ProductsList = () => {
       try {
         console.log("token", localStorage.getItem("token"));
         const response = await axios.get(
-          "https://ims-clxd.onrender.com/api/customer/products",
+          "http://localhost:5000/api/customer/products",
           {
             headers: {
               "Content-Type": "application/json",
@@ -108,7 +108,7 @@ export const ProductsList = () => {
               Now ${calculateFinalPrice(product).toFixed(2)}
             </div>
             <div className="ml-10 text-gray-500 text-sm line-through">
-              ${product.price}
+              ${product.price * 3}
             </div>
           </div>
           <div className="ml-10">{product.description}</div>

@@ -15,8 +15,9 @@ import {
     Boxes,
     PackageSearch,
     Repeat2,
-    PackagePlus,
-    LogOut, // for logout icon
+    LogOut, 
+    BarChart,
+    Package// for logout icon
   } from "lucide-react"
   
   const items = [
@@ -43,12 +44,17 @@ import {
     {
       title: "Adding new products",
       url: "/manager/add",
-      icon: PackagePlus,
+      icon: BarChart ,
+    },
+    {
+      title: "Expiry/discount",
+      url: "/manager/expiry",
+      icon: Package,
     },
     {
       title: "Analytics",
-      url: "/manager/analytics",
-      icon: PackagePlus,
+      url: "/manager/ml",
+      icon: Package,
     },
   ]
   
