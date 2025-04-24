@@ -16,6 +16,8 @@ const supplier_1 = __importDefault(require("./routes/supplier"));
 const customer_1 = __importDefault(require("./routes/customer"));
 const cashier_1 = __importDefault(require("./routes/cashier"));
 const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
+const manager_2 = require("./controllers/manager");
+const auth_1 = require("./middleware/auth");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
@@ -70,4 +72,5 @@ app.use((err, req, res, next) => {
         message: err.message,
     });
 });
+app.get("/api/v1/inventory/items", (0, auth_1.checkAuth)(["MANAGER"]), manager_2.listInventory);
 exports.default = app;

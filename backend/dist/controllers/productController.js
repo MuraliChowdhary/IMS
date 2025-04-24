@@ -18,54 +18,121 @@ const fs_1 = __importDefault(require("fs"));
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const uploadCSVProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    const filePath = (_a = req.file) === null || _a === void 0 ? void 0 : _a.path;
-    if (!filePath) {
-        res.status(400).json({ message: 'CSV file is required' });
+    if (!req.file) {
+        res.status(400).json({ message: 'No file uploaded' });
         return;
     }
+    const filePath = req.file.path;
     const products = [];
-    fs_1.default.createReadStream(filePath)
-        .pipe((0, csv_parser_1.default)())
-        .on('data', (row) => {
-        if (!row.name || !row.price || !row.stock)
-            return; // basic validation
-        products.push({
-            name: row.name,
-            price: parseFloat(row.price),
-            stock: parseInt(row.stock),
-            category: row.category,
-            SKU: row.SKU,
-            isPerishable: row.isPerishable === 'true',
-            seasonality: row.seasonality,
-            shelfLife: parseInt(row.shelfLife || '0'),
-            imageUrls: row.imageUrls ? row.imageUrls.split(';') : [],
-            description: row.description,
-            supplierId: row.supplierId || null
-        });
-    })
-        .on('end', () => __awaiter(void 0, void 0, void 0, function* () {
-        try {
-            const added = yield prisma.product.createMany({
-                data: products,
-                skipDuplicates: true
-            });
-            res.status(200).json({ message: 'Products added successfully', added });
-        }
-        catch (err) {
-            console.error('Insert Error:', err);
-            res.status(500).json({ message: 'Failed to insert products' });
-        }
-        finally {
-            if (filePath) {
-                try {
-                    fs_1.default.unlinkSync(filePath);
+    const errors = [];
+    try {
+        yield new Promise((resolve, reject) => {
+            fs_1.default.createReadStream(filePath)
+                .pipe((0, csv_parser_1.default)({
+                mapHeaders: ({ header }) => header.trim(),
+                mapValues: ({ value, header }) => {
+                    // Convert specific fields to proper types
+                    if (['price', 'stock', 'shelfLife'].includes(header)) {
+                        return value ? parseFloat(value) : null;
+                    }
+                    if (header === 'isPerishable') {
+                        (value === null || value === void 0 ? void 0 : value.toLowerCase()) === 'true';
+                    }
+                    if (header === 'imageUrls' && value) {
+                        value.split(';').map((url) => url.trim());
+                    }
+                    (value === null || value === void 0 ? void 0 : value.trim()) || null;
+                    return;
                 }
-                catch (unlinkError) {
-                    console.error('Error deleting file:', unlinkError);
+            }))
+                .on('data', (row) => {
+                // Validate required fields
+                if (!row.name || row.price == null || row.stock == null || !row.category) {
+                    errors.push(`Missing required fields in row: ${JSON.stringify(row)}`);
+                    return;
+                }
+                // Additional validation
+                if (isNaN(row.price) || row.price <= 0) {
+                    errors.push(`Invalid price (${row.price}) for product: ${row.name}`);
+                    return;
+                }
+                if (isNaN(row.stock) || row.stock < 0) {
+                    errors.push(`Invalid stock (${row.stock}) for product: ${row.name}`);
+                    return;
+                }
+                products.push({
+                    name: row.name,
+                    price: row.price,
+                    stock: row.stock,
+                    category: row.category,
+                    SKU: row.SKU,
+                    isPerishable: row.isPerishable || false,
+                    seasonality: row.seasonality,
+                    shelfLife: row.shelfLife,
+                    imageUrls: row.imageUrls || [],
+                    description: row.description,
+                    supplierId: row.supplierId
+                });
+            })
+                .on('end', () => {
+                if (errors.length > 0) {
+                    reject(new Error(`Validation failed for ${errors.length} rows`));
+                }
+                else if (products.length === 0) {
+                    reject(new Error('No valid products found in CSV'));
+                }
+                else {
+                    resolve();
+                }
+            })
+                .on('error', (error) => {
+                reject(error);
+            });
+        });
+        const result = yield prisma.product.createMany({
+            data: products,
+            skipDuplicates: true
+        });
+        res.status(200).json({
+            success: true,
+            message: 'Products imported successfully',
+            importedCount: result.count,
+            duplicateCount: products.length - result.count,
+            totalRows: products.length
+        });
+        return;
+    }
+    catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message,
+            errors: errors,
+            sampleFormat: {
+                requiredFields: ['name (string)', 'price (number)', 'stock (number)', 'category (string)'],
+                optionalFields: [
+                    'SKU (string)',
+                    'isPerishable (boolean)',
+                    'seasonality (string)',
+                    'shelfLife (number)',
+                    'imageUrls (semicolon-separated strings)',
+                    'description (string)',
+                    'supplierId (string)'
+                ],
+                example: {
+                    name: 'Sample Product',
+                    price: 9.99,
+                    stock: 100,
+                    category: 'Sample Category',
+                    supplierId: 'cm77dfehf0002v1osfa2ne9j6'
                 }
             }
+        });
+        return;
+    }
+    finally {
+        if (filePath && fs_1.default.existsSync(filePath)) {
+            fs_1.default.unlinkSync(filePath);
         }
-    }));
+    }
 });
 exports.uploadCSVProducts = uploadCSVProducts;

@@ -14,6 +14,8 @@ import supplierRoutes from "./routes/supplier";
 import customerRoutes from "./routes/customer";
 import cashierRoutes from "./routes/cashier";
 import authRoutes from "./routes/authRoutes";
+import { listInventory } from "./controllers/manager";
+import { checkAuth } from "./middleware/auth";
 
  
 dotenv.config();
@@ -88,6 +90,9 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   });
 });
 
+
+
+app.get("/api/v1/inventory/items",checkAuth(["MANAGER"]), listInventory);
 
 
 

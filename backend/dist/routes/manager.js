@@ -35,5 +35,7 @@ router.patch("/deliveredConfirmation/:orderId", (0, auth_1.checkAuth)(["MANAGER"
 router.get("/pendingSupplierOrders", (0, auth_1.checkAuth)(["MANAGER"]), manager_1.pendingSupplierOrders);
 router.get("/pendingStoreOrdersBySupplier", (0, auth_1.checkAuth)(["MANAGER"]), manager_1.pendingStoreOrdersBySupplier);
 router.post("/productFilters", (0, auth_1.checkAuth)(["MANAGER"]), (0, express_validator_1.check)("MANAGER"), manager_1.getProductsWithFilters);
-router.post('add/products', uploadMiddleware_1.upload.single('file'), productController_1.uploadCSVProducts);
+router.get('/expiring', (0, auth_1.checkAuth)(["MANAGER"]), manager_1.getExpiringProducts);
+router.post('/discount', (0, auth_1.checkAuth)(["MANAGER"]), manager_1.createExpiryDiscount);
+router.post('/add/csv', uploadMiddleware_1.upload.single('file'), productController_1.uploadCSVProducts);
 exports.default = router;

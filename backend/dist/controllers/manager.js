@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getProductsWithFilters = exports.pendingStoreOrdersBySupplier = exports.pendingSupplierOrders = exports.getCurrentInventoryValue = exports.markOrderAsDelivered = exports.qualityCheck = exports.reviewPriceProposal = exports.checkInventoryLevels = exports.lowstock = exports.getProducts = exports.getProductById = exports.addProducts = exports.deleteProduct = exports.updateProduct = exports.addProduct = exports.updateInventory = exports.addInventoryItem = exports.getInventoryItem = exports.listInventory = void 0;
+exports.createExpiryDiscount = exports.getExpiringProducts = exports.getProductsWithFilters = exports.pendingStoreOrdersBySupplier = exports.pendingSupplierOrders = exports.getCurrentInventoryValue = exports.markOrderAsDelivered = exports.qualityCheck = exports.reviewPriceProposal = exports.checkInventoryLevels = exports.lowstock = exports.getProducts = exports.getProductById = exports.addProducts = exports.deleteProduct = exports.updateProduct = exports.addProduct = exports.updateInventory = exports.addInventoryItem = exports.getInventoryItem = exports.listInventory = void 0;
 const client_1 = require("@prisma/client");
 const console_1 = require("console");
 const prisma = new client_1.PrismaClient();
@@ -844,6 +844,114 @@ const getProductsWithFilters = (req, res) => __awaiter(void 0, void 0, void 0, f
     }
 });
 exports.getProductsWithFilters = getProductsWithFilters;
+const getExpiringProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const daysThreshold = parseInt(req.query.days) || 7; // Default to 7 days
+        const today = new Date();
+        const thresholdDate = new Date(today);
+        thresholdDate.setDate(today.getDate() + daysThreshold);
+        // Find products expiring within the threshold period
+        const expiringProducts = yield prisma.inventory.findMany({
+            where: {
+                expirationDate: {
+                    not: null,
+                    lte: thresholdDate,
+                    gt: today, // Only include products not already expired
+                },
+                quantity: {
+                    gt: 0, // Only include products still in stock
+                },
+            },
+            include: {
+                product: true,
+                supplier: {
+                    select: {
+                        name: true,
+                        contact: true,
+                        email: true,
+                    },
+                },
+            },
+            orderBy: {
+                expirationDate: 'asc', // Sort by earliest expiry first
+            },
+        });
+        // Calculate days remaining for each product
+        const formattedResults = expiringProducts.map(item => {
+            const daysRemaining = item.expirationDate
+                ? Math.ceil((item.expirationDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+                : null;
+            return {
+                id: item.id,
+                name: item.name,
+                productId: item.productId,
+                productName: item.product.name,
+                category: item.category,
+                quantity: item.quantity,
+                expirationDate: item.expirationDate,
+                daysRemaining,
+                price: item.price,
+                supplier: item.supplier,
+                suggestedAction: daysRemaining && daysRemaining <= 3
+                    ? 'Consider discount promotion'
+                    : 'Monitor stock levels'
+            };
+        });
+        res.status(200).json({
+            count: formattedResults.length,
+            expiringProducts: formattedResults
+        });
+    }
+    catch (error) {
+        console.error('Error fetching expiring products:', error);
+        res.status(500).json({ error: 'Failed to fetch expiring products' });
+    }
+});
+exports.getExpiringProducts = getExpiringProducts;
+// Add endpoint to mark products as discounted or take action on expiring items
+const createExpiryDiscount = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { inventoryId, discountPercentage, expiryAction } = req.body;
+        if (!inventoryId || !discountPercentage) {
+            res.status(400).json({ error: 'Inventory ID and discount percentage are required' });
+            return;
+        }
+        // Get the inventory item
+        const inventory = yield prisma.inventory.findUnique({
+            where: { id: inventoryId },
+            include: { product: true }
+        });
+        if (!inventory) {
+            res.status(404).json({ error: 'Inventory item not found' });
+            return;
+        }
+        // Calculate discounted price
+        const originalPrice = inventory.price;
+        const discountedPrice = originalPrice * (1 - (discountPercentage / 100));
+        // Update product price with discount
+        const updatedProduct = yield prisma.product.update({
+            where: { id: inventory.productId },
+            data: {
+                price: discountedPrice,
+            }
+        });
+        // Record this action in a transaction log (you'd likely have this table)
+        // For now let's just return the successful update
+        res.status(200).json({
+            message: 'Discount applied successfully',
+            product: updatedProduct,
+            originalPrice,
+            discountedPrice,
+            discountPercentage,
+            action: expiryAction || 'Apply discount'
+        });
+    }
+    catch (error) {
+        console.error('Error applying discount:', error);
+        res.status(500).json({ error: 'Failed to apply discount' });
+    }
+});
+exports.createExpiryDiscount = createExpiryDiscount;
 // Automatic inventory check and reorder trigger
 // export const checkInventoryLevels = async () => {
 //   try {

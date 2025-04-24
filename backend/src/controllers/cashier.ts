@@ -37,8 +37,8 @@ export const products = async (req: Request, res: Response) => {
 
 // Initialize Razorpay client with your API keys
 const razorpay = new Razorpay({
-    key_id: 'rzp_test_eieHlTMTtnQ3n3', // Your Razorpay Key ID
-    key_secret: 'HQqAP8TFRMV5ub7YKmQ2zxxG' // Your Razorpay Key Secret
+    key_id: 'rzp_test_BLs9VsUa9tB42w', // Your Razorpay Key ID
+    key_secret: 'ixubHH6XGqJ14FOsLWUH1KRR' // Your Razorpay Key Secret
 });
 
 // Controller to create an order
@@ -121,6 +121,88 @@ const razorpay = new Razorpay({
 //         res.status(500).json({ message: "Internal server error", error: (error as Error).message });
 //     }
 // };
+
+// export const order = async (req: Request, res: Response) => {
+//     const { orderId, customerId, products }: { orderId: string, customerId: string; products: { productId: string; quantity: number }[] } = req.body;
+
+//     try {
+//         let totalAmount = 0;
+//         const orderProducts = [];
+//         const productIds = products.map((p) => p.productId).filter((id) => id !== undefined);
+//         console.log("Filtered productIds:", productIds);
+
+//         const fetchedProducts = await prisma.product.findMany({
+//             where: { id: { in: productIds } },
+//         });
+
+//         const productMap = new Map(fetchedProducts.map((p) => [p.id, p]));
+
+//         for (const { productId, quantity } of products) {
+//             const product = productMap.get(productId);
+
+//             if (!product) {
+//                 res.status(400).json({ message: `Product with ID ${productId} not found` });
+//                 return
+//             }
+
+//             if (product.stock < quantity) {
+//                 res.status(400).json({ message: `Insufficient stock for product ${product.name}` });
+//                 return
+//             }
+
+//             const productTotal = product.price * quantity;
+//             totalAmount += productTotal;
+
+//             orderProducts.push({
+//                 productId: product.id,
+//                 quantity,
+//                 price: product.price,
+//             });
+//         }
+
+//         totalAmount = parseFloat(totalAmount.toFixed(2));
+
+//         // Check if order exists using `orderId`
+//         const existingOrder = await prisma.order.findUnique({
+//             where: { id: orderId },
+//             include: { products: true },
+//         });
+
+//         if (!existingOrder) {
+//             res.status(404).json({ message: `Order with ID ${orderId} not found` });
+//             return
+//         }
+
+//         // **Update existing order**
+//         const updatedOrder = await prisma.order.update({
+//             where: { id: orderId },
+//             data: {
+//                 totalAmount,
+//                 products: {
+//                     deleteMany: {}, // Remove all existing products in the order
+//                     create: orderProducts.map((orderProduct) => ({
+//                         productId: orderProduct.productId,
+//                         quantity: orderProduct.quantity,
+//                         requestedPrice: orderProduct.price,
+//                     })),
+//                 },
+//             },
+//             include: { products: true },
+//         });
+
+//         res.status(200).json({
+//             message: "Order updated successfully",
+//             order: updatedOrder,
+//         });
+//         return
+
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ message: "Internal server error", error: (error as Error).message });
+//     }
+// };
+
+
 export const order = async (req: Request, res: Response) => {
     const { orderId, customerId, products }: { orderId: string, customerId: string; products: { productId: string; quantity: number }[] } = req.body;
 
@@ -141,12 +223,12 @@ export const order = async (req: Request, res: Response) => {
 
             if (!product) {
                 res.status(400).json({ message: `Product with ID ${productId} not found` });
-                return
+                return;
             }
 
             if (product.stock < quantity) {
                 res.status(400).json({ message: `Insufficient stock for product ${product.name}` });
-                return
+                return;
             }
 
             const productTotal = product.price * quantity;
@@ -169,14 +251,23 @@ export const order = async (req: Request, res: Response) => {
 
         if (!existingOrder) {
             res.status(404).json({ message: `Order with ID ${orderId} not found` });
-            return
+            return;
         }
+
+        // Create Razorpay order
+        const razorpayOrder = await razorpay.orders.create({
+            amount: Math.round(totalAmount * 100), // Convert to paise
+            currency: 'INR',
+            receipt: `order_receipt_${Date.now()}`,
+            payment_capture: true,
+        });
 
         // **Update existing order**
         const updatedOrder = await prisma.order.update({
             where: { id: orderId },
             data: {
                 totalAmount,
+                razorpayOrderId: razorpayOrder.id, // Store Razorpay order ID
                 products: {
                     deleteMany: {}, // Remove all existing products in the order
                     create: orderProducts.map((orderProduct) => ({
@@ -192,14 +283,15 @@ export const order = async (req: Request, res: Response) => {
         res.status(200).json({
             message: "Order updated successfully",
             order: updatedOrder,
+            razorpay_order_id: razorpayOrder.id, // Send Razorpay order ID in the response
+            amount: totalAmount,
         });
-        return
-
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal server error", error: (error as Error).message });
     }
 };
+
 
 
 
