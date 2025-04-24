@@ -41,7 +41,7 @@ export const PendingOrderSupplier = () => {
     const fetchOrders = async () => {
       try {
         const response = await axios.get(
-          "https://ims-clxd.onrender.com//api/manager/pendingStoreOrdersBySupplier",
+          "https://ims-clxd.onrender.com/api/manager/pendingStoreOrdersBySupplier",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,

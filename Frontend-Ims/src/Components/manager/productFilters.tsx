@@ -33,7 +33,7 @@ const ProductFilters = () => {
     setError("");
     try {
       const response = await axios.post(
-        "https://ims-clxd.onrender.com//api/manager/productFilters",
+        "https://ims-clxd.onrender.com/api/manager/productFilters",
         {
           search,
           category,

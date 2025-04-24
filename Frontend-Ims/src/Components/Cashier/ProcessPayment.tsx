@@ -93,7 +93,7 @@ export const ProcessPayment: React.FC<ProcessPaymentProps> = ({
         try {
           // Send payment details to your backend for verification
           const result = await fetch(
-            "https://ims-clxd.onrender.com//api/cashier/process-payment",
+            "https://ims-clxd.onrender.com/api/cashier/process-payment",
             {
               method: "POST",
               headers: {

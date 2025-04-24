@@ -60,7 +60,7 @@ export default function UploadProductCSV() {
 
     try {
       const res = await axios.post(
-        "https://ims-clxd.onrender.com//api/manager/add/csv",
+        "https://ims-clxd.onrender.com/api/manager/add/csv",
         formData,
         {
           headers: {

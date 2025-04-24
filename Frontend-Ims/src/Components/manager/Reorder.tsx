@@ -46,7 +46,7 @@ interface Summary {
 }
 
 // const { data = {} as FetchResponse, loading, error } = useFetch(
-//   "https://ims-clxd.onrender.com/manager/inventory"
+//   "https://ims-clxd.onrender.commanager/inventory"
 // );
 
 const Reorder = () => {
@@ -54,7 +54,7 @@ const Reorder = () => {
     data = {} as FetchResponse,
     loading,
     error,
-  } = useFetch("https://ims-clxd.onrender.com//api/manager/lowstock");
+  } = useFetch("https://ims-clxd.onrender.com/api/manager/lowstock");
   console.log(data);
 
   const reorderItem: InventoryProp[] = Array.isArray(data?.data.items)

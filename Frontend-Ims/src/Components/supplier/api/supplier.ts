@@ -1,7 +1,7 @@
 // api/supplier.js
 import axios from 'axios';
 
-const API_URL = "https://ims-clxd.onrender.com/";
+const API_URL = "https://ims-clxd.onrender.com";
 
 
 export type ProposePriceResponse = unknown;
