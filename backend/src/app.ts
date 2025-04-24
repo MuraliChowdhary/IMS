@@ -23,36 +23,25 @@ dotenv.config();
 const app = express();
 
 app.use(express.json());
-const corsMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  const allowedOrigins = [
-    'https://inventorysolutions.vercel.app', 
-    'http://localhost:5173'
-  ];
-  
-  const origin = req.headers.origin;
+const allowedOrigins = [
+  'https://inventorysolutions.vercel.app',
+  'http://localhost:5173'
+];
 
-  // Set Access-Control-Allow-Origin if origin is allowed
-  if (origin && allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
-
-  // Set other CORS headers
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-
-  // Handle preflight requests
-  if (req.method === 'OPTIONS') {
-     res.status(200).end();
-     return
-  }
-
-   next();
-   return
-};
-
-// Apply the middleware
-app.use(corsMiddleware);
+app.use(cors({
+  origin: function (origin, callback) {
+    // allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+}));
 
 app.use(morgan("dev"));
 app.use(helmet());
