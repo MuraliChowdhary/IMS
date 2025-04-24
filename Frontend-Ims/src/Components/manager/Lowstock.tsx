@@ -46,7 +46,7 @@ export default function LowStock() {
     async function fetchData() {
       try {
         const response = await axios.get<LowStockResponse>(
-          "http://localhost:5000/api/manager/lowstock",
+          "https://ims-clxd.onrender.com//api/manager/lowstock",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,

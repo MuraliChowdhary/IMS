@@ -8,7 +8,10 @@ import { toast } from "sonner";
 import axios from "axios";
 import { Progress } from "../ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
-import { ExclamationTriangleIcon, CheckCircledIcon } from "@radix-ui/react-icons";
+import {
+  ExclamationTriangleIcon,
+  CheckCircledIcon,
+} from "@radix-ui/react-icons";
 
 export default function UploadProductCSV() {
   const [file, setFile] = useState<File | null>(null);
@@ -24,13 +27,17 @@ export default function UploadProductCSV() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const selectedFile = e.target.files[0];
-      
+
       // Basic file validation
-      if (selectedFile && selectedFile.type !== "text/csv" && !selectedFile.name.endsWith('.csv')) {
+      if (
+        selectedFile &&
+        selectedFile.type !== "text/csv" &&
+        !selectedFile.name.endsWith(".csv")
+      ) {
         toast.error("Please select a CSV file");
         return;
       }
-      
+
       if (selectedFile) {
         setFile(selectedFile);
       }
@@ -53,7 +60,7 @@ export default function UploadProductCSV() {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/manager/add/csv",
+        "https://ims-clxd.onrender.com//api/manager/add/csv",
         formData,
         {
           headers: {
@@ -79,20 +86,22 @@ export default function UploadProductCSV() {
         duplicates: res.data.duplicates || 0,
       });
       toast.success(res.data.message);
-      
+
       // Reset file input after successful upload
       setFile(null);
-      const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+      const fileInput = document.querySelector(
+        'input[type="file"]'
+      ) as HTMLInputElement;
       if (fileInput) fileInput.value = "";
-      
     } catch (err: any) {
       console.error("Upload error:", err);
-      
+
       let errorMessage = "Something went wrong";
       if (err.response) {
-        errorMessage = err.response.data?.message || 
-                      err.response.statusText || 
-                      `Server responded with ${err.response.status}`;
+        errorMessage =
+          err.response.data?.message ||
+          err.response.statusText ||
+          `Server responded with ${err.response.status}`;
       } else if (err.request) {
         errorMessage = "No response from server";
       } else {
@@ -120,16 +129,19 @@ export default function UploadProductCSV() {
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="space-y-2">
-          <Input 
-            type="file" 
-            accept=".csv" 
+          <Input
+            type="file"
+            accept=".csv"
             onChange={handleFileChange}
             disabled={isUploading}
           />
           <p className="text-sm text-muted-foreground">
             Accepted format: <code>.csv</code> with required fields:{" "}
             <code>name, price, stock</code> and optional fields:{" "}
-            <code>category, SKU, isPerishable, seasonality, shelfLife, imageUrls, description, supplierId</code>
+            <code>
+              category, SKU, isPerishable, seasonality, shelfLife, imageUrls,
+              description, supplierId
+            </code>
           </p>
         </div>
 
@@ -166,8 +178,8 @@ export default function UploadProductCSV() {
           </Alert>
         )}
 
-        <Button 
-          onClick={handleUpload} 
+        <Button
+          onClick={handleUpload}
           disabled={!file || isUploading}
           className="w-full"
         >

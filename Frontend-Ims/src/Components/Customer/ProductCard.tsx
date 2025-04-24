@@ -33,7 +33,7 @@ export const ProductsCard = () => {
     async function fetchItem() {
       try {
         const response = await axios.get(
-          `http://localhost:5000/api/customer/products/${id}`,
+          `https://ims-clxd.onrender.com//api/customer/products/${id}`,
           {
             headers: {
               "Content-Type": "application/json",

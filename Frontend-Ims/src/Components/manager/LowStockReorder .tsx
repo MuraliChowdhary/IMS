@@ -45,7 +45,7 @@ export const LowStockReorder = () => {
     const fetchLowStock = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:5000/api/manager/lowstock",
+          "https://ims-clxd.onrender.com//api/manager/lowstock",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -72,7 +72,7 @@ export const LowStockReorder = () => {
     setReordering(true);
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/manager/reorder",
+        "https://ims-clxd.onrender.com//api/manager/reorder",
         {},
         {
           headers: {

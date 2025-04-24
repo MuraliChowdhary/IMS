@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -31,54 +31,62 @@ const ExpiryDiscountDashboard: React.FC = () => {
   const [products, setProducts] = useState<ExpiringProduct[]>([]);
   const [discounts, setDiscounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(false);
-  const [applyDiscountToggle, setApplyDiscountToggle] = useState<Record<string, boolean>>({});
+  const [applyDiscountToggle, setApplyDiscountToggle] = useState<
+    Record<string, boolean>
+  >({});
 
   const fetchExpiringProducts = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/manager/expiring', {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + localStorage.getItem("token")
+      const response = await axios.get(
+        "https://ims-clxd.onrender.com//api/manager/expiring",
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
         }
-      });
+      );
       setProducts(response.data.expiringProducts);
       // Initialize toggle states for each product
-      const initialToggleStates = response.data.expiringProducts.reduce((acc: Record<string, boolean>, product: ExpiringProduct) => {
-        acc[product.id] = false;
-        return acc;
-      }, {});
+      const initialToggleStates = response.data.expiringProducts.reduce(
+        (acc: Record<string, boolean>, product: ExpiringProduct) => {
+          acc[product.id] = false;
+          return acc;
+        },
+        {}
+      );
       setApplyDiscountToggle(initialToggleStates);
     } catch {
-      toast.error('Failed to fetch expiring products');
+      toast.error("Failed to fetch expiring products");
     }
   };
 
   const handleToggleChange = (productId: string) => {
-    setApplyDiscountToggle(prev => ({
+    setApplyDiscountToggle((prev) => ({
       ...prev,
-      [productId]: !prev[productId]
+      [productId]: !prev[productId],
     }));
   };
 
   const applyDiscount = async (inventoryId: string): Promise<void> => {
     if (!applyDiscountToggle[inventoryId]) {
-      toast.warning('Please enable the toggle to apply discount');
+      toast.warning("Please enable the toggle to apply discount");
       return; // Explicitly return here to ensure no value is returned in this case
     }
 
     const discountPercentage = discounts[inventoryId];
-    if (!discountPercentage) { 
-        toast.warning('Enter a discount % first'); 
-        return
-}
+    if (!discountPercentage) {
+      toast.warning("Enter a discount % first");
+      return;
+    }
     setLoading(true);
     try {
       const response = await axios.post(
-        'http://localhost:5000/api/manager/discount',
+        "https://ims-clxd.onrender.com//api/manager/discount",
         {
           inventoryId,
           discountPercentage,
-          expiryAction: 'Apply discount and promote Rice combo',
+          expiryAction: "Apply discount and promote Rice combo",
         },
         {
           headers: {
@@ -90,7 +98,7 @@ const ExpiryDiscountDashboard: React.FC = () => {
 
       console.log("Success:", response.data.discountedPrice);
       toast.success(`Discount applied: ₹${response.data.discountedPrice}`);
-      
+
       // Refresh the product list after successful discount application
       fetchExpiringProducts();
     } catch (error) {
@@ -116,12 +124,18 @@ const ExpiryDiscountDashboard: React.FC = () => {
           <Card key={product.id} className="rounded-2xl shadow-md">
             <CardContent className="p-4">
               <h2 className="text-xl font-semibold mb-1">{product.name}</h2>
-              <p className="text-sm text-muted-foreground">Category: {product.category}</p>
+              <p className="text-sm text-muted-foreground">
+                Category: {product.category}
+              </p>
               <p className="text-sm">Price: ₹{product.price}</p>
               <p className="text-sm">Quantity: {product.quantity}</p>
-              <p className="text-sm">Expires in: {product.daysRemaining} days</p>
-              <p className="text-sm text-yellow-600 font-medium mt-1">{product.suggestedAction}</p>
-              
+              <p className="text-sm">
+                Expires in: {product.daysRemaining} days
+              </p>
+              <p className="text-sm text-yellow-600 font-medium mt-1">
+                {product.suggestedAction}
+              </p>
+
               <div className="flex items-center space-x-2 mt-3">
                 <Switch
                   id={`toggle-${product.id}`}
@@ -129,7 +143,9 @@ const ExpiryDiscountDashboard: React.FC = () => {
                   onCheckedChange={() => handleToggleChange(product.id)}
                 />
                 <Label htmlFor={`toggle-${product.id}`}>
-                  {applyDiscountToggle[product.id] ? 'Discount Enabled' : 'Discount Disabled'}
+                  {applyDiscountToggle[product.id]
+                    ? "Discount Enabled"
+                    : "Discount Disabled"}
                 </Label>
               </div>
 
@@ -143,9 +159,12 @@ const ExpiryDiscountDashboard: React.FC = () => {
                       placeholder="e.g. 10"
                       min="1"
                       max="100"
-                      value={discounts[product.id] || ''}
+                      value={discounts[product.id] || ""}
                       onChange={(e) =>
-                        setDiscounts({ ...discounts, [product.id]: Number(e.target.value) })
+                        setDiscounts({
+                          ...discounts,
+                          [product.id]: Number(e.target.value),
+                        })
                       }
                       className="mt-1"
                     />
@@ -162,7 +181,7 @@ const ExpiryDiscountDashboard: React.FC = () => {
             </CardContent>
           </Card>
         ))
-      )}    
+      )}
     </div>
   );
 };
