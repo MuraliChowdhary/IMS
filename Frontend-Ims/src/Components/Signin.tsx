@@ -13,7 +13,7 @@
 //     }
 //     const handleSubmit =async()=>{
 //        try{
-//         const response  = await axios.post('https://ims-clxd.onrender.comauth/login', {
+//         const response  = await axios.post('http://localhost:5000auth/login', {
 //             email:email,
 //             password:password
 
@@ -115,6 +115,7 @@ import axios, { AxiosError } from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { LoadingBUtton } from "./LoadingButton";
+import { toast } from "sonner";
 //import { useAuth } from "./AuthContext"; // Import AuthContext
 
 export const Signin = () => {
@@ -138,7 +139,7 @@ export const Signin = () => {
     try {
       console.log("email", email);
       const response = await axios.post(
-        "https://ims-clxd.onrender.com/api/auth/login",
+        "http://localhost:5000/api/auth/login",
         {
           email,
           password,
@@ -155,6 +156,7 @@ export const Signin = () => {
         localStorage.setItem("user", JSON.stringify(response.data.user));
         localStorage.setItem("token", response.data.token);
         const user = response.data.user;
+        toast.success("Successfully logged in!");
         navigate("/" + `${user.role.toLowerCase()}`);
       }
     } catch (err) {

@@ -50,15 +50,16 @@ import {
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import axios from "axios";
+import { toast } from "sonner";
 
 export function SupportDialog() {
   const [form, setForm] = useState({ name: "", email: "", message: "" });
 
   const handleSubmit = async () => {
     try {
-      const res = await axios.post("http://localhost:5005/api/send-email", form);
+      const res = await axios.post("https://email-service-m1hp.onrender.com/api/send-email", form);
       console.log(res)
-      alert("Message sent successfully!");
+      toast.success("Message sent successfully!");
       setForm({ name: "", email: "", message: "" });
     } catch (err) {
       alert("Error sending message");

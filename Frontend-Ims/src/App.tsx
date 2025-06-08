@@ -63,6 +63,8 @@ import LowStockWithSidebarPage from "./Components/manager/LowStockWithSidebarPag
               <Route path="/manager/analytics" element={<AnalyticsDashboard />}/>
               <Route path="/manager/expiry" element={<ExpiryDiscountDashboard/>}/>
               <Route path="/manager/ml" element={<MLDashboard/>}/>
+              <Route path="/HowItWorksPage" element={<HowItWorksPage/>} />
+              <Route path="/new-version-under-dev" element={<StoreSetupGuide/>}/>
               {/* <Toaster position="top-right" richColors /> */}
           </Routes>
         </BrowserRouter>
@@ -97,6 +99,8 @@ import UploadProductCSV from "./Components/manager/UploadProductCSV";
 import AnalyticsDashboard from "./Components/manager/Analtics";
 import ExpiryDiscountDashboard from "./Components/manager/ExpiryDiscount";
 import MLDashboard from "./Components/manager/MlCode";
+import HowItWorksPage from "./Components/Home/Howitsworks";
+import StoreSetupGuide from "./Components/Home/StoreSetupGuide";
 
 // function App() {
 //   return (

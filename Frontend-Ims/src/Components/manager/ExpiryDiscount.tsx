@@ -38,7 +38,7 @@ const ExpiryDiscountDashboard: React.FC = () => {
   const fetchExpiringProducts = async () => {
     try {
       const response = await axios.get(
-        "https://ims-clxd.onrender.com/api/manager/expiring",
+        "http://localhost:5000/api/manager/expiring",
         {
           headers: {
             "Content-Type": "application/json",
@@ -82,7 +82,7 @@ const ExpiryDiscountDashboard: React.FC = () => {
     setLoading(true);
     try {
       const response = await axios.post(
-        "https://ims-clxd.onrender.com/api/manager/discount",
+        "http://localhost:5000/api/manager/discount",
         {
           inventoryId,
           discountPercentage,

@@ -33,7 +33,7 @@
 //     data = {} as FetchResponse,
 //     loading,
 //     error,
-//   } = useFetch("https://ims-clxd.onrender.com/api/manager/inventory");
+//   } = useFetch("http://localhost:5000/api/manager/inventory");
 
 //   const inventory: InventoryProp[] = Array.isArray(data?.inventory)
 //     ? data.inventory
@@ -145,7 +145,7 @@ export default function CurrentInventory() {
     async function fetchData() {
       try {
         const response = await axios.get(
-          "https://ims-clxd.onrender.com/api/manager/inventory/currentInventoryValue",
+          "http://localhost:5000/api/manager/inventory/currentInventoryValue",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
