@@ -17,12 +17,12 @@ import { Button } from "../ui/button"
 export function NavigationMenuDemo() {
   return (
     <div className="flex justify-between items-center w-full h-16 border-b  border-gray-800 bg-black px-6">
-      {/* Logo/Brand */}
+      
       <Link to="/" className="flex items-center space-x-2 mr-8">
         <span className="text-xl font-bold text-white">Primemart</span>
       </Link>
 
-      {/* Main Navigation */}
+      
       <NavigationMenu>
         <NavigationMenuList className="gap-1">
           <NavigationMenuItem>
@@ -43,10 +43,10 @@ export function NavigationMenuDemo() {
                     </div>
                   </NavigationMenuLink>
                 </li>
-                <ListItem href="/dashboard/summary" title="Summary" className="hover:bg-gray-800 hover:text-white">
+                <ListItem href="/" title="Summary" className="hover:bg-gray-800 hover:text-white">
                   Quick view of your inventory health metrics
                 </ListItem>
-                <ListItem href="/dashboard/alerts" title="Alerts" className="hover:bg-gray-800 hover:text-gray-200">
+                <ListItem href="/" title="Alerts" className="hover:bg-gray-800 hover:text-gray-200">
                   Active alerts requiring your attention
                 </ListItem>
                  
@@ -61,28 +61,28 @@ export function NavigationMenuDemo() {
             <NavigationMenuContent>
               <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px] bg-gray-900 text-white">
                 <ListItem
-                  href="/inventory/items"
+                  href="/"
                   title="All Items"
                   className="hover:bg-gray-800"
                 >
                   Browse and manage all inventory items
                 </ListItem>
                 <ListItem
-                  href="/inventory/categories"
+                  href="/"
                   title="Categories"
                   className="hover:bg-gray-800"
                 >
                   Organize items by categories
                 </ListItem>
                 <ListItem
-                  href="/inventory/low-stock"
+                  href="/"
                   title="Low Stock"
                   className="hover:bg-gray-800 text-amber-400"
                 >
                   Items below reorder threshold
                 </ListItem>
                 <ListItem
-                  href="/inventory/expiring"
+                  href="/"
                   title="Expiring Soon"
                   className="hover:bg-gray-800 text-red-400"
                 >
@@ -93,20 +93,14 @@ export function NavigationMenuDemo() {
           </NavigationMenuItem>
 
           <NavigationMenuItem>
-            <Link to="/orders">
+            <Link to="/HowItWorksPage">
               <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "bg-gray-black text-white   ")}>
-                Orders
+                 HowItWorksPage
               </NavigationMenuLink>
             </Link>
           </NavigationMenuItem>
 
-          <NavigationMenuItem>
-            <Link to="/suppliers">
-              <NavigationMenuLink className={cn(navigationMenuTriggerStyle(), "bg-gray-black text-white")}>
-                Suppliers
-              </NavigationMenuLink>
-            </Link>
-          </NavigationMenuItem>
+        
         </NavigationMenuList>
       </NavigationMenu>
 
