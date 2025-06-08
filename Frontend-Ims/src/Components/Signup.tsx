@@ -14,11 +14,10 @@ export const Signup = () => {
   const navigate = useNavigate();
 
   const handleSignin = () => {
-     
     navigate("/signin");
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e:any) => {
     e.preventDefault();    
 
    

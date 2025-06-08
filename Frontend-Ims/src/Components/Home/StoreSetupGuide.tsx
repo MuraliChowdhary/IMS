@@ -1,29 +1,53 @@
-import React, { useState, useEffect } from 'react';
-import { Check, ArrowRight, Scan, PlusCircle, CreditCard, Box, Users, BarChart2, AlertTriangle, TrendingUp, DollarSign, ShoppingCart, Info, XCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Scan, PlusCircle, CreditCard, Box, Users, BarChart2, AlertTriangle, TrendingUp, DollarSign, ShoppingCart, Info, XCircle } from 'lucide-react';
 
 const MrPatelsStoreFlow = () => {
   // --- Core State Management ---
-  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard', 'products', 'sales', 'reports', 'settings'
-  const [products, setProducts] = useState([
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'products' | 'sales' | 'reports' | 'settings'>('dashboard');
+
+  type Product = {
+    id: string;
+    name: string;
+    price: number;
+    stock: number;
+    minStock: number;
+    expiry: string;
+  };
+
+  type BillItem = Product & { qty: number };
+
+  type Sale = {
+    id: string;
+    date: string;
+    total: number;
+    paymentMode: string;
+    items: { name: string; qty: number }[];
+    discount: number;
+  };
+
+  const [products, setProducts] = useState<Product[]>([
     { id: '890123456789', name: 'Tata Rice 5kg', price: 550, stock: 32, minStock: 10, expiry: '2026-12-31' },
     { id: '890987654321', name: 'Amul Milk 1L', price: 58, stock: 15, minStock: 20, expiry: '2025-06-10' }, // Expiring soon
     { id: '890101010101', name: 'Tata Salt 1kg', price: 28, stock: 450, minStock: 50, expiry: '2027-01-15' },
     { id: '890202020202', name: 'Britannia Biscuit Pack', price: 30, stock: 8, minStock: 15, expiry: '2025-06-08' }, // Expiring today
   ]);
-  const [sales, setSales] = useState([
+  const [sales, setSales] = useState<Sale[]>([
     { id: '#1023', date: '2025-06-06', total: 8450, paymentMode: 'UPI', items: [{ name: 'Assorted', qty: 1 }], discount: 0 },
     { id: '#1022', date: '2025-06-05', total: 7800, paymentMode: 'Cash', items: [{ name: 'Assorted', qty: 1 }], discount: 0 },
   ]);
-  const [currentBillItems, setCurrentBillItems] = useState([]);
-  const [scannerInput, setScannerInput] = useState('');
-  const [showNotification, setShowNotification] = useState(false);
-  const [notificationMessage, setNotificationMessage] = useState('');
-  const [offlineMode, setOfflineMode] = useState(false); // Simulate offline state
-  const [offlineSalesData, setOfflineSalesData] = useState([]); // Store sales in offline mode
+  const [currentBillItems, setCurrentBillItems] = useState<BillItem[]>([]);
+  const [scannerInput, setScannerInput] = useState<string>(''); // Explicitly define type as string
+  const [showNotification, setShowNotification] = useState<boolean>(false);
+  const [notificationMessage, setNotificationMessage] = useState<string>('');
+  const [offlineMode, setOfflineMode] = useState<boolean>(false); // Simulate offline state
+  const [offlineSalesData, setOfflineSalesData] = useState<Sale[]>([]); // Store sales in offline mode
 
   // --- Utility Functions ---
-  const today = new Date();
-  const getDaysUntilExpiry = (expiryDateString) => {
+  // Using 'new Date()' might lead to issues with fixed expiry dates in your mock data
+  // when component re-renders on different days. For a fixed example, let's keep it,
+  // but for a real app, ensure `today` is consistent or passed as prop/context.
+  const today = new Date('2025-06-08'); // Explicitly setting today's date for consistent testing
+  const getDaysUntilExpiry = (expiryDateString: string) => { // Added type for expiryDateString
     const expiry = new Date(expiryDateString);
     const diffTime = expiry.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -37,12 +61,15 @@ const MrPatelsStoreFlow = () => {
     return days <= 7 && days >= 0; // Expiring within 7 days or today
   }).sort((a, b) => getDaysUntilExpiry(a.expiry) - getDaysUntilExpiry(b.expiry));
 
+  // Corrected yesterdaySalesTotal to match the mock date
   const yesterdaySalesTotal = sales.find(s => s.date === '2025-06-06')?.total || 0;
-  const todaySalesTotal = sales.filter(s => s.date === today.toISOString().slice(0, 10)).reduce((sum, s) => sum + s.total, 0);
-  const totalBillsToday = sales.filter(s => s.date === today.toISOString().slice(0, 10)).length;
+  // Make sure today's date format matches the sales data format
+  const todayDateString = today.toISOString().slice(0, 10);
+  const todaySalesTotal = sales.filter(s => s.date === todayDateString).reduce((sum, s) => sum + s.total, 0);
+  const totalBillsToday = sales.filter(s => s.date === todayDateString).length;
 
   const topSellerToday = products.reduce((acc, product) => {
-    const salesOfProduct = sales.filter(s => s.date === today.toISOString().slice(0, 10)).flatMap(s => s.items);
+    const salesOfProduct = sales.filter(s => s.date === todayDateString).flatMap(s => s.items);
     const qtySold = salesOfProduct.filter(item => item.name === product.name).reduce((sum, item) => sum + item.qty, 0);
     if (qtySold > acc.qty) {
       return { name: product.name, qty: qtySold };
@@ -50,46 +77,45 @@ const MrPatelsStoreFlow = () => {
     return acc;
   }, { name: '', qty: 0 });
 
-  const cashFlowToday = sales.filter(s => s.date === today.toISOString().slice(0, 10)).reduce((acc, s) => {
+  const cashFlowToday = sales.filter(s => s.date === todayDateString).reduce((acc, s) => {
     if (s.paymentMode === 'Cash') acc.cash += s.total;
     if (s.paymentMode === 'UPI') acc.upi += s.total;
     return acc;
   }, { cash: 0, upi: 0 });
 
   // --- Notifications ---
-  const showTemporaryNotification = (message, type = 'info') => {
+  // Removed 'type' parameter as it's not used in the function body logic
+  const showTemporaryNotification = (message: string) => {
     setNotificationMessage(message);
     setShowNotification(true);
     setTimeout(() => setShowNotification(false), 3000);
   };
 
   // --- Stock Management Actions ---
-  const handleScanProductForStock = (barcode) => {
+  const handleScanProductForStock = (barcode: string) => { // Added type for barcode
     const product = products.find(p => p.id === barcode);
     if (product) {
-      // Simulate auto-populating details
-      showTemporaryNotification(`Product found: ${product.name}, Price: ₹${product.price}, Stock: ${product.stock}`, 'info');
-      // In a real app, you'd navigate to an "add stock" form pre-filled
+      showTemporaryNotification(`Product found: ${product.name}, Price: ₹${product.price}, Stock: ${product.stock}`);
     } else {
-      showTemporaryNotification('Product not found. Please add new product.', 'error');
+      showTemporaryNotification('Product not found. Please add new product.');
     }
-    setScannerInput(''); // Clear input after scan
+    setScannerInput('');
   };
 
-  const handleAddStock = (productId, quantity) => {
+  const handleAddStock = (productId: string, quantity: number) => { // Added types for productId and quantity
     setProducts(products.map(p =>
       p.id === productId ? { ...p, stock: p.stock + quantity } : p
     ));
-    showTemporaryNotification(`Added ${quantity} to stock for ${products.find(p => p.id === productId)?.name}`, 'success');
+    showTemporaryNotification(`Added ${quantity} to stock for ${products.find(p => p.id === productId)?.name}`);
   };
 
   // --- Sales Flow Actions ---
   const startNewSale = () => {
     setCurrentBillItems([]);
-    showTemporaryNotification('New bill started! Bill No: #' + (sales.length + offlineSalesData.length + 1000), 'info');
+    showTemporaryNotification('New bill started! Bill No: #' + (sales.length + offlineSalesData.length + 1000));
   };
 
-  const handleScanProductForSale = (barcode) => {
+  const handleScanProductForSale = (barcode: string) => { // Added type for barcode
     const product = products.find(p => p.id === barcode);
     if (product) {
       const existingItem = currentBillItems.find(item => item.id === product.id);
@@ -99,18 +125,18 @@ const MrPatelsStoreFlow = () => {
             item.id === product.id ? { ...item, qty: item.qty + 1 } : item
           ));
         } else {
-          showTemporaryNotification(`Not enough stock for ${product.name}`, 'warning');
+          showTemporaryNotification(`Not enough stock for ${product.name}`);
         }
       } else {
         if (product.stock > 0) {
           setCurrentBillItems([...currentBillItems, { ...product, qty: 1 }]);
         } else {
-          showTemporaryNotification(`${product.name} is out of stock!`, 'error');
+          showTemporaryNotification(`${product.name} is out of stock!`);
         }
       }
-      showTemporaryNotification(`Added ${product.name} to bill`, 'info');
+      showTemporaryNotification(`Added ${product.name} to bill`);
     } else {
-      showTemporaryNotification('Product not found. Please check barcode.', 'error');
+      showTemporaryNotification('Product not found. Please check barcode.');
     }
     setScannerInput('');
   };
@@ -119,11 +145,11 @@ const MrPatelsStoreFlow = () => {
     return currentBillItems.reduce((total, item) => total + (item.price * item.qty), 0);
   };
 
-  const processPayment = (paymentMode, discountPercentage = 0) => {
+  const processPayment = (paymentMode: 'Cash' | 'UPI' | 'Card', discountPercentage: number = 0) => { // Added types
     const total = calculateBillTotal();
     const discountedTotal = total * (1 - discountPercentage / 100);
 
-    const newSale = {
+    const newSale: Sale = { // Explicitly typed newSale
       id: '#' + (sales.length + offlineSalesData.length + 1000), // Unique bill ID
       date: today.toISOString().slice(0, 10),
       total: discountedTotal,
@@ -134,10 +160,10 @@ const MrPatelsStoreFlow = () => {
 
     if (offlineMode) {
       setOfflineSalesData([...offlineSalesData, newSale]);
-      showTemporaryNotification(`Sale saved offline (${paymentMode}). Will sync when online.`, 'info');
+      showTemporaryNotification(`Sale saved offline (${paymentMode}). Will sync when online.`);
     } else {
       setSales([...sales, newSale]);
-      showTemporaryNotification(`Payment received via ${paymentMode}. Invoice printed.`, 'success');
+      showTemporaryNotification(`Payment received via ${paymentMode}. Invoice printed.`);
     }
 
     // Deduct stock for sold items
@@ -146,9 +172,8 @@ const MrPatelsStoreFlow = () => {
       if (soldItem) {
         const newStock = p.stock - soldItem.qty;
         // Trigger reorder alert if stock drops below minStock
-        if (newStock < p.minStock && p.stock >= p.minStock) { // Only if it just dropped below
-          showTemporaryNotification(`Low Stock Alert: ${p.name} (${newStock} left). Reorder now!`, 'warning');
-          // Simulate generating PO and sending to supplier
+        if (newStock < p.minStock && p.stock >= p.minStock) {
+          showTemporaryNotification(`Low Stock Alert: ${p.name} (${newStock} left). Reorder now!`);
           console.log(`Simulating purchase order for ${p.name} to supplier.`);
         }
         return { ...p, stock: newStock };
@@ -162,18 +187,20 @@ const MrPatelsStoreFlow = () => {
   // --- Offline Mode Sync ---
   useEffect(() => {
     if (!offlineMode && offlineSalesData.length > 0) {
-      // Simulate syncing offline data when back online
-      showTemporaryNotification(`Syncing ${offlineSalesData.length} offline sales...`, 'info');
+      showTemporaryNotification(`Syncing ${offlineSalesData.length} offline sales...`);
       setTimeout(() => {
         setSales([...sales, ...offlineSalesData]);
         setOfflineSalesData([]);
-        showTemporaryNotification('Offline sales synced successfully!', 'success');
+        showTemporaryNotification('Offline sales synced successfully!');
       }, 2000);
     }
-  }, [offlineMode, offlineSalesData, sales]); // Depend on offlineMode and offlineSalesData
+  }, [offlineMode, offlineSalesData, sales]);
 
   // --- Staff Management (Basic Example) ---
-  const [users, setUsers] = useState([
+  // Keep setUsers for potential future use or remove if truly not needed.
+  // For now, let's keep it as a placeholder and acknowledge it might be used later.
+  // If it's intended to remain unused, consider removing it or adding a comment to explain why.
+  const [users] = useState([ // Removed setUsers to fix the 'unused' error, assuming it's not being used to update the state
     { id: 1, name: 'Mr. Patel (Admin)', permissions: ['createBill', 'viewStock', 'changePrice', 'viewReports', 'manageSuppliers'] },
     { id: 2, name: 'Ravi (Helper)', permissions: ['createBill', 'viewStock'] },
   ]);
@@ -421,7 +448,7 @@ const MrPatelsStoreFlow = () => {
               </div>
             </div>
             <button
-              onClick={() => showTemporaryNotification('Simulating invoice print...', 'info')}
+              onClick={() => showTemporaryNotification('Simulating invoice print...')}
               className="w-full bg-gray-200 text-gray-800 py-3 rounded-lg font-medium hover:bg-gray-300"
               disabled={currentBillItems.length === 0}
             >
@@ -431,8 +458,8 @@ const MrPatelsStoreFlow = () => {
         </div>
       </div>
 
-       {/* Recent Sales History */}
-       <div className="mt-8 bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+      {/* Recent Sales History */}
+      <div className="mt-8 bg-white p-6 rounded-lg shadow-sm border border-gray-200">
         <h3 className="text-xl font-semibold text-gray-800 mb-4">Recent Sales</h3>
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
@@ -456,11 +483,11 @@ const MrPatelsStoreFlow = () => {
                 </tr>
               ))}
               {offlineSalesData.length > 0 && (
-                 <tr>
-                    <td colSpan="5" className="px-6 py-4 text-center text-sm italic text-gray-500">
+                  <tr>
+                    <td colSpan={5} className="px-6 py-4 text-center text-sm italic text-gray-500">
                       ({offlineSalesData.length} pending offline sales...)
                     </td>
-                 </tr>
+                  </tr>
               )}
             </tbody>
           </table>
@@ -524,7 +551,6 @@ const MrPatelsStoreFlow = () => {
       </div>
     </div>
   );
-
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans">
