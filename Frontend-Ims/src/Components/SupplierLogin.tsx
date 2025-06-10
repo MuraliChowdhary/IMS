@@ -14,7 +14,7 @@ export const SupplierLogin = () => {
   const handleSubmit = async () => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/supplier/login",
+        "https://ims-clxd.onrender.com/api/auth/supplier/login",
         {
           email: email,
           password: password,
@@ -36,7 +36,7 @@ export const SupplierLogin = () => {
       console.log(err);
       setError(
         (err as AxiosError<{ message: string }>).response?.data?.message ||
-          "Something went wrong. Please try again."
+        "Something went wrong. Please try again."
       );
     }
   }; ////bg-gradient-to-r from-blue-300 via-blue-400 to-blue-500

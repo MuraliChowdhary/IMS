@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "sonner"; 
+import { toast } from "sonner";
 
 export const Signup = () => {
   const [email, setEmail] = useState("");
@@ -10,30 +10,30 @@ export const Signup = () => {
   const [mobile, setMobile] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSignin = () => {
     navigate("/signin");
   };
 
-  const handleSubmit = async (e:any) => {
-    e.preventDefault();    
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
 
-   
+
     if (!name || !mobile || !email || !password) {
       setError("All fields are required.");
       setSuccess("");
-      return; 
+      return;
     }
 
-    setError("");  
+    setError("");
 
-    setLoading(true); 
+    setLoading(true);
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/register",
+        "https://ims-clxd.onrender.com/api/auth/register",
         {
           username: name,
           email,
@@ -43,15 +43,15 @@ export const Signup = () => {
       );
 
       if (response.status === 201) {
-       
+
         setSuccess(response.data.message || "Registration successful!");
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.user));
         const user = response.data.user;
-        toast.success("Successfully registered!"); 
+        toast.success("Successfully registered!");
         navigate("/" + `${user.role.toLowerCase()}` + "Dashboard");
       } else {
-         
+
         setError(response.data.message || "An unexpected error occurred.");
       }
     } catch (err) {
@@ -60,10 +60,10 @@ export const Signup = () => {
           ? err.response.data.message
           : "Something went wrong. Please try again.";
       setError(errorMessage);
-      setSuccess(""); 
-      toast.error(errorMessage); 
+      setSuccess("");
+      toast.error(errorMessage);
     } finally {
-      setLoading(false);  
+      setLoading(false);
     }
   };
 
@@ -75,7 +75,7 @@ export const Signup = () => {
             Sign Up
           </div>
           <form onSubmit={handleSubmit} className="w-full">
-            
+
             <div className="w-full mb-2">
               <label
                 htmlFor="name"
@@ -90,10 +90,10 @@ export const Signup = () => {
                 className="w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
                 onChange={(e) => setName(e.target.value)}
                 value={name}
-                required  
+                required
               />
             </div>
-            
+
             <div className="w-full mb-2">
               <label
                 htmlFor="mobile"
@@ -111,7 +111,7 @@ export const Signup = () => {
                 required
               />
             </div>
-           
+
             <div className="w-full mb-2">
               <label
                 htmlFor="email"
@@ -120,7 +120,7 @@ export const Signup = () => {
                 Email address <span className="text-red-500">*</span>
               </label>
               <input
-                type="email"  
+                type="email"
                 id="email"
                 placeholder="Email"
                 className="w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
@@ -129,7 +129,7 @@ export const Signup = () => {
                 required
               />
             </div>
-            
+
             <div className="w-full mb-2">
               <label
                 htmlFor="password"
@@ -150,13 +150,12 @@ export const Signup = () => {
 
             <div className="w-full flex justify-center mt-4">
               <button
-                type="submit"  
-                disabled={loading} 
-                className={`w-full bg-blue-600 text-white px-10 py-2 rounded font-sans transition-colors duration-200 ${
-                  loading
+                type="submit"
+                disabled={loading}
+                className={`w-full bg-blue-600 text-white px-10 py-2 rounded font-sans transition-colors duration-200 ${loading
                     ? "opacity-70 cursor-not-allowed"
                     : "hover:bg-sky-600 cursor-pointer"
-                }`}
+                  }`}
               >
                 {loading ? "Signing up..." : "Sign Up"}
               </button>
@@ -173,7 +172,7 @@ export const Signup = () => {
             </a>
           </div>
 
-          
+
           {error && (
             <div className="text-red-500 text-sm mt-4 text-center">
               {error}
