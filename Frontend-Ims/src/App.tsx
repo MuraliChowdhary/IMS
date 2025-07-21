@@ -1,7 +1,5 @@
 import { Home } from "./Components/Home/Home";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Signin } from './Components/Signin';
-import { SignupForm } from './Components/Signup';
+import { BrowserRouter, Routes, Route } from "react-router-dom"; 
 import { CustomerDashboard } from "./Components/Customer/CustomerDashboard";
 import { ProductsCard } from './Components/Customer/ProductCard';
 import { Cart } from './Components/Customer/Cart';
