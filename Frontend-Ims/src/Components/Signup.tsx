@@ -1,66 +1,57 @@
-import axios from "axios";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { toast } from "sonner";
+/*
+File: src/Components/SignupForm.tsx
+Description: A new form component for user registration.
+*/
+"use client";
 
-export const Signup = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [name, setName] = useState("");
-  const [mobile, setMobile] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate, Link } from "react-router-dom";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
+import { Button } from "@/Components/ui/button";
+import { Input } from "@/Components/ui/input";
+import { Label } from "@/Components/ui/label";
+import { IconLoader2 } from "@tabler/icons-react";
+
+export function SignupForm({ className, ...props }: React.ComponentProps<"form">) {
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    contact: "",
+  });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleSignin = () => {
-    navigate("/signin");
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-
-    if (!name || !mobile || !email || !password) {
-      setError("All fields are required.");
-      setSuccess("");
-      return;
-    }
-
-    setError("");
-
     setLoading(true);
 
     try {
       const response = await axios.post(
         "https://ims-clxd.onrender.com/api/auth/register",
-        {
-          username: name,
-          email,
-          password,
-          contact: mobile,
-        }
+        formData
       );
 
       if (response.status === 201) {
-
-        setSuccess(response.data.message || "Registration successful!");
+        toast.success(response.data.message || "Registration successful!");
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("user", JSON.stringify(response.data.user));
         const user = response.data.user;
-        toast.success("Successfully registered!");
-        navigate("/" + `${user.role.toLowerCase()}` + "Dashboard");
-      } else {
-
-        setError(response.data.message || "An unexpected error occurred.");
+        // Navigate to the appropriate dashboard based on user role
+        navigate(`/${user.role.toLowerCase()}/dashboard`);
       }
     } catch (err) {
       const errorMessage =
         axios.isAxiosError(err) && err.response?.data?.message
           ? err.response.data.message
           : "Something went wrong. Please try again.";
-      setError(errorMessage);
-      setSuccess("");
       toast.error(errorMessage);
     } finally {
       setLoading(false);
@@ -68,123 +59,41 @@ export const Signup = () => {
   };
 
   return (
-    <div>
-      <div className="w-full h-screen flex items-center justify-center">
-        <div className="bg-slate-50 w-96 h-3/4 rounded-xl p-9 shadow-2xl flex flex-col justify-evenly items-center">
-          <div className="mt-2 text-center text-2xl font-bold tracking-tight text-gray-900 mb-1">
-            Sign Up
-          </div>
-          <form onSubmit={handleSubmit} className="w-full">
-
-            <div className="w-full mb-2">
-              <label
-                htmlFor="name"
-                className="block text-sm font-medium text-gray-900 mb-1"
-              >
-                Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="name"
-                placeholder="Name"
-                className="w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
-                onChange={(e) => setName(e.target.value)}
-                value={name}
-                required
-              />
-            </div>
-
-            <div className="w-full mb-2">
-              <label
-                htmlFor="mobile"
-                className="block text-sm font-medium text-gray-900 mb-1"
-              >
-                Mobile <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                id="mobile"
-                placeholder="Mobile"
-                className="w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
-                onChange={(e) => setMobile(e.target.value)}
-                value={mobile}
-                required
-              />
-            </div>
-
-            <div className="w-full mb-2">
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-900 mb-1"
-              >
-                Email address <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="email"
-                id="email"
-                placeholder="Email"
-                className="w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
-                onChange={(e) => setEmail(e.target.value)}
-                value={email}
-                required
-              />
-            </div>
-
-            <div className="w-full mb-2">
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-900 mb-1"
-              >
-                Password <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="password"
-                id="password"
-                placeholder="Password"
-                className="w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
-                onChange={(e) => setPassword(e.target.value)}
-                value={password}
-                required
-              />
-            </div>
-
-            <div className="w-full flex justify-center mt-4">
-              <button
-                type="submit"
-                disabled={loading}
-                className={`w-full bg-blue-600 text-white px-10 py-2 rounded font-sans transition-colors duration-200 ${loading
-                  ? "opacity-70 cursor-not-allowed"
-                  : "hover:bg-sky-600 cursor-pointer"
-                  }`}
-              >
-                {loading ? "Signing up..." : "Sign Up"}
-              </button>
-            </div>
-          </form>
-
-          <div className="mt-4 text-sm">
-            Already a member?{" "}
-            <a
-              onClick={handleSignin}
-              className="text-blue-600 hover:underline cursor-pointer"
-            >
-              Sign in
-            </a>
-          </div>
-
-
-          {error && (
-            <div className="text-red-500 text-sm mt-4 text-center">
-              {error}
-            </div>
-          )}
-          {success && (
-            <div className="text-green-500 text-sm mt-4 text-center">
-              {success}
-            </div>
-          )}
-        </div>
+    <form className={cn("flex flex-col gap-6", className)} onSubmit={handleSubmit} {...props}>
+      <div className="flex flex-col items-center gap-2 text-center">
+        <h1 className="text-2xl font-bold">Create an account</h1>
+        <p className="text-muted-foreground text-sm text-balance">
+          Enter your details below to create your account
+        </p>
       </div>
-    </div>
+      <div className="grid gap-4">
+        <div className="grid gap-2">
+          <Label htmlFor="username">Name</Label>
+          <Input id="username" type="text" placeholder="John Doe" value={formData.username} onChange={handleInputChange} required />
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor="email">Email</Label>
+          <Input id="email" type="email" placeholder="m@example.com" value={formData.email} onChange={handleInputChange} required />
+        </div>
+         <div className="grid gap-2">
+          <Label htmlFor="contact">Mobile</Label>
+          <Input id="contact" type="tel" placeholder="9876543210" value={formData.contact} onChange={handleInputChange} required />
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor="password">Password</Label>
+          <Input id="password" type="password" value={formData.password} onChange={handleInputChange} required />
+        </div>
+        <Button type="submit" className="w-full" disabled={loading}>
+          {loading && <IconLoader2 className="mr-2 h-4 w-4 animate-spin" />}
+          Sign Up
+        </Button>
+      </div>
+      <div className="text-center text-sm">
+        Already have an account?{" "}
+        <Link to="/login" className="underline underline-offset-4">
+          Sign in
+        </Link>
+      </div>
+    </form>
   );
-};
+}

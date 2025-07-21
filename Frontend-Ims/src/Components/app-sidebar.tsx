@@ -223,9 +223,9 @@ export function NavUser({ user }: NavUserProps) {
                 <p className="text-xs text-muted-foreground">{user.email}</p>
             </div>
             <Button  variant="ghost" size="icon"
-            //  onClick={() => {
-            //   localStorage.removeItem("token");
-            //   window.location.href = "/signin"}}
+             onClick={() => {
+              localStorage.removeItem("token");
+              window.location.href = "/login"}}
               >
                 <IconLogout className="h-5 w-5" />
             </Button>

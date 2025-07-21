@@ -106,10 +106,10 @@ export function NavigationMenuDemo() {
 
       {/* Auth Buttons */}
       <div className="flex items-center space-x-2 ml-auto">
-         <Button variant="outline" className="hidden lg:block  bg-blue-500 border-none text-white"  onClick={() => window.location.href = "/signup"}>
+         <Button variant="outline" className="hidden lg:block  bg-blue-500 border-none text-white"  onClick={() => window.location.href = "/login"}>
           Sign In
         </Button>
-        <Button variant="outline" className="hidden lg:block bg-gray-900 text-white border-none" onClick={() => window.location.href = "/signin"}>Login</Button>
+        <Button variant="outline" className="hidden lg:block bg-gray-900 text-white border-none" onClick={() => window.location.href = "/signup"}>Join Us</Button>
       </div>
     </div>
   )

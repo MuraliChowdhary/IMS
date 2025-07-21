@@ -1,7 +1,7 @@
 import { Home } from "./Components/Home/Home";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Signin } from './Components/Signin';
-import { Signup } from './Components/Signup';
+import { SignupForm } from './Components/Signup';
 import { CustomerDashboard } from "./Components/Customer/CustomerDashboard";
 import { ProductsCard } from './Components/Customer/ProductCard';
 import { Cart } from './Components/Customer/Cart';
@@ -36,6 +36,8 @@ import ProductCatalogPage from "./Components/managerNew/ProductCatalogPage";
 import LowStockAlertsPage from "./Components/managerNew/LowStockAlertsPage";
 import { TopPerformers } from "./Components/managerNew/TopPerformers";
 import ExpiryManagementDashboard from "./Components/managerNew/ExpiryMangement";
+import LoginPage from "./login/page";
+import ResgisterForm from "./register/page";
 
 function App() {
   return (
@@ -47,9 +49,9 @@ function App() {
           <Route path="/HowItWorksPage" element={<HowItWorksPage />} />
           <Route path="/new-version-under-dev" element={<MrPatelsStoreFlow />} />
           <Route path="/cart" element={<Cart />} />
-          <Route path="/signin" element={<Signin />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/customerDashboard" element={<CustomerDashboard />} />
+          {/* <Route path="/signin" element={<Signin />} />
+          <Route path="/signup" element={<SignupForm />} /> */}
+          <Route path="/customer/dashboard" element={<CustomerDashboard />} />
           <Route path="/customer" element={<CustomerDashboard />} />
           <Route path="/productCard/:id" element={<ProductsCard />} />
           <Route path="/cashierDashboard" element={<CashierDashboard />} />
@@ -62,6 +64,8 @@ function App() {
           <Route path="/supplier" element={<SupplierDashboard />} />
           <Route path="/supplier/login" element={<SupplierLogin />} />
           <Route path="/supplier/register" element={<SupplierRegister />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<ResgisterForm />} />
 
           {/* --- MANAGER ROUTES (with shared layout) --- */}
           <Route 
@@ -97,6 +101,7 @@ const ManagerRoutes = () => {
             <Route path="product-catalog" element={<ProductCatalogPage />} />
             <Route path="low-stock-alerts" element={<LowStockAlertsPage />} />
             <Route path="top-performers" element={<TopPerformers />} />
+            
         </Route>
     </Routes>
   )
