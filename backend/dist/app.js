@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // app.ts
 const express_1 = __importDefault(require("express"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const cors_1 = __importDefault(require("cors"));
 const morgan_1 = __importDefault(require("morgan"));
 const helmet_1 = __importDefault(require("helmet"));
 // Import Routes
@@ -21,30 +22,12 @@ const auth_1 = require("./middleware/auth");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
-const corsMiddleware = (req, res, next) => {
-    const allowedOrigins = [
-        'https://inventorysolutions.vercel.app',
-        'http://localhost:5173'
-    ];
-    const origin = req.headers.origin;
-    // Set Access-Control-Allow-Origin if origin is allowed
-    if (origin && allowedOrigins.includes(origin)) {
-        res.setHeader('Access-Control-Allow-Origin', origin);
-    }
-    // Set other CORS headers
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    // Handle preflight requests
-    if (req.method === 'OPTIONS') {
-        res.status(200).end();
-        return;
-    }
-    next();
-    return;
-};
-// Apply the middleware
-app.use(corsMiddleware);
+app.use("/*", (0, cors_1.default)({
+    origin: ['https://inventorysolutions.vercel.app', 'http://localhost:5173'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use((0, morgan_1.default)("dev"));
 app.use((0, helmet_1.default)());
 app.get("/", (req, res) => {

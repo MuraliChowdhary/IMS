@@ -14,7 +14,7 @@ const router = Router();
 // router.get("/reorder", checkAuth(["MANAGER"]), viewLowStock);
 // router.post("/reorder", checkAuth(["MANAGER"]), createReorder);
 
-import { listInventory, getInventoryItem, addInventoryItem, updateInventory,reviewPriceProposal,addProduct, addProducts, getProducts, getProductById, updateProduct, lowstock, checkInventoryLevels, qualityCheck, markOrderAsDelivered, getCurrentInventoryValue, pendingSupplierOrders, getProductsWithFilters, pendingStoreOrdersBySupplier, getExpiringProducts, createExpiryDiscount } from "../controllers/manager";
+import { listInventory, getInventoryItem, addInventoryItem, updateInventory,reviewPriceProposal,addProduct, addProducts, getProducts, getProductById, updateProduct, lowstock, checkInventoryLevels, qualityCheck, markOrderAsDelivered, getCurrentInventoryValue, pendingSupplierOrders, getProductsWithFilters, pendingStoreOrdersBySupplier, createExpiryDiscount, getExpiryReport, getDashboardOverview, getLowStockReport } from "../controllers/manager";
 import { check } from "express-validator";
 router.get("/inventory", checkAuth(["MANAGER"]), listInventory);
 router.get("/inventoryItem/:id", checkAuth(["MANAGER"]), getInventoryItem);
@@ -46,9 +46,13 @@ router.patch("/deliveredConfirmation/:orderId",checkAuth(["MANAGER"]),markOrderA
  router.post("/productFilters", checkAuth(["MANAGER"]), check("MANAGER"), getProductsWithFilters);
 
 
- router.get('/expiring', checkAuth(["MANAGER"]),getExpiringProducts);
+ router.get('/expiring', checkAuth(["MANAGER"]),getExpiryReport);
 router.post('/discount', checkAuth(["MANAGER"]),createExpiryDiscount);
 
  router.post('/add/csv', upload.single('file'), uploadCSVProducts);
+
+
+ router.get("/dashboard-overview", checkAuth(["MANAGER"]), getDashboardOverview);
+ router.get("/low-stock-report", checkAuth(["MANAGER"]), getLowStockReport);
 
 export default router;

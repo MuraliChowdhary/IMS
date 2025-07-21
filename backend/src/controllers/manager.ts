@@ -10,6 +10,221 @@ import { processPayment } from './cashier';
 import { error } from "console";
  
 const prisma = new PrismaClient();
+
+
+/*
+File: src/controllers/managerController.ts
+Description: A new, consolidated endpoint to fetch all key stats for the manager dashboard.
+*/
+ 
+// Helper to get the start and end of a date
+const getDayBounds = (date: Date) => {
+    const start = new Date(date);
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(date);
+    end.setHours(23, 59, 59, 999);
+    return { start, end };
+};
+
+export const getDashboardOverview = async (req: Request, res: Response) => {
+    try {
+        const todayBounds = getDayBounds(new Date());
+        const yesterdayBounds = getDayBounds(new Date(Date.now() - 86400000));
+        const nextWeek = new Date();
+        nextWeek.setDate(nextWeek.getDate() + 7);
+
+        // --- Run all data queries in parallel for maximum efficiency ---
+        const [
+            todaySales,
+            yesterdaySales,
+            inventoryValue,
+            lowStockCount,
+            expiringCount,
+            topProductToday,
+        ] = await Promise.all([
+            // 1. Today's Sales and Transactions
+            prisma.transaction.aggregate({
+                where: { createdAt: { gte: todayBounds.start, lte: todayBounds.end }, transactionType: 'SALE' },
+                _sum: { total: true },
+                _count: { id: true },
+            }),
+            // 2. Yesterday's Sales for comparison
+            prisma.transaction.aggregate({
+                where: { createdAt: { gte: yesterdayBounds.start, lte: yesterdayBounds.end }, transactionType: 'SALE' },
+                _sum: { total: true },
+            }),
+            // 3. Total Inventory Value
+            prisma.inventory.aggregate({
+                _sum: { quantity: true, price: true }, // Note: This is a simplified value. A more accurate way would be a raw query SUM(quantity * price).
+            }),
+            // 4. Low Stock Items Count
+            prisma.inventory.count({
+                where: { quantity: { lte: prisma.inventory.fields.threshold } },
+            }),
+            // 5. Expiring This Week Count
+            prisma.inventory.count({
+                where: { expirationDate: { not: null, gte: new Date(), lte: nextWeek } },
+            }),
+            // 6. Top Selling Product Today
+            prisma.transaction.groupBy({
+                by: ['productId'],
+                where: { createdAt: { gte: todayBounds.start, lte: todayBounds.end }, transactionType: 'SALE' },
+                _sum: { quantity: true },
+                orderBy: { _sum: { quantity: 'desc' } },
+                take: 1,
+            }),
+        ]);
+        
+        // --- Process the results ---
+        const todayTotal = todaySales._sum.total || 0;
+        const yesterdayTotal = yesterdaySales._sum.total || 0;
+        const salesChange = yesterdayTotal > 0 ? ((todayTotal - yesterdayTotal) / yesterdayTotal) * 100 : (todayTotal > 0 ? 100 : 0);
+
+        let topSeller = { name: 'N/A', unitsSold: 0 };
+        if (topProductToday.length > 0) {
+            const topProductId = topProductToday[0].productId;
+            const productDetails = await prisma.product.findUnique({ where: { id: topProductId }, select: { name: true } });
+            topSeller = {
+                name: productDetails?.name || 'Unknown',
+                unitsSold: topProductToday[0]._sum.quantity || 0,
+            };
+        }
+        
+        // A raw query is better for inventory value calculation
+        const inventoryValueResult: { total_value: number }[] = await prisma.$queryRaw`
+            SELECT SUM(quantity * price) as total_value FROM "Inventory" WHERE quantity > 0;
+        `;
+        const totalInventoryValue = inventoryValueResult[0]?.total_value || 0;
+
+        // --- Construct the final response object ---
+        const response = {
+            todaySales: {
+                total: todayTotal,
+                change: salesChange.toFixed(1),
+            },
+            transactions: todaySales._count.id || 0,
+            inventoryValue: totalInventoryValue,
+            lowStockItems: lowStockCount,
+            expiringThisWeek: expiringCount,
+            topSellerToday: topSeller,
+            activeAlerts: lowStockCount + expiringCount,
+            // Placeholder for profit margin - this requires cost price which is complex
+            profitMargin: {
+                value: 15.2, // Placeholder
+                change: 8.0, // Placeholder
+            }
+        };
+
+        res.status(200).json(response);
+
+    } catch (error) {
+        console.error("Error fetching dashboard overview:", error);
+        res.status(500).json({ message: "Failed to fetch dashboard overview" });
+    }
+};
+
+/*
+File: src/controllers/managerController.ts
+Description: A new, detailed endpoint to fetch all low stock products with pagination and filtering.
+*/
+ 
+export const getLowStockReport = async (req: Request, res: Response) => {
+  try {
+    // --- 1. Get Query Parameters ---
+    const { 
+      search = '', 
+      page = '1', 
+      limit = '10' 
+    } = req.query;
+
+    const pageNum = parseInt(page as string);
+    const limitNum = parseInt(limit as string);
+    const skip = (pageNum - 1) * limitNum;
+    const searchTerm = (search as string).trim();
+
+    // --- 2. Define Where Clause for Filtering ---
+    const whereClause: any = {
+      // An item is low stock if its quantity is at or below its reorder level
+      quantity: {
+        lte: prisma.inventory.fields.reorderLevel,
+      },
+      // Apply search filter if provided
+      ...(searchTerm && {
+        product: {
+          OR: [
+            { name: { contains: searchTerm, mode: 'insensitive' } },
+            { SKU: { contains: searchTerm, mode: 'insensitive' } },
+          ],
+        },
+      }),
+    };
+
+    // --- 3. Fetch Data and Total Count in Parallel ---
+    const [items, totalCount] = await Promise.all([
+      prisma.inventory.findMany({
+        where: whereClause,
+        select: {
+          id: true,
+          quantity: true,
+          reorderLevel: true,
+          product: {
+            select: {
+              id: true,
+              name: true,
+              SKU: true,
+              imageUrls: true,
+            },
+          },
+          supplier: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+        orderBy: {
+          // Optional: order by how low the stock is
+          quantity: 'asc',
+        },
+        skip,
+        take: limitNum,
+      }),
+      prisma.inventory.count({ where: whereClause }),
+    ]);
+
+    // --- 4. Format the Response ---
+    const formattedData = items.map(item => ({
+      ...item,
+      totalStock: item.quantity, // For consistency with frontend
+    }));
+
+    const criticalCount = items.filter(it => it.quantity <= it.reorderLevel * 0.5).length;
+
+    res.status(200).json({
+      summary: {
+        total: totalCount,
+        critical: criticalCount,
+      },
+      pagination: {
+        currentPage: pageNum,
+        totalPages: Math.ceil(totalCount / limitNum),
+        limit: limitNum,
+        totalCount,
+      },
+      data: formattedData,
+    });
+
+  } catch (error) {
+    console.error("Failed to fetch low stock report:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+
+
+
+
+
 export const listInventory = async (req: Request, res: Response) => {
 
     try {
@@ -996,74 +1211,74 @@ export const getProductsWithFilters = async (req: Request, res: Response) => {
 };
 
 
-export const getExpiringProducts = async (req: Request, res: Response) => {
-  try {
-    const daysThreshold = parseInt(req.query.days as string) || 7; // Default to 7 days
+// export const getExpiringProducts = async (req: Request, res: Response) => {
+//   try {
+//     const daysThreshold = parseInt(req.query.days as string) || 7; // Default to 7 days
     
-    const today = new Date();
-    const thresholdDate = new Date(today);
-    thresholdDate.setDate(today.getDate() + daysThreshold);
+//     const today = new Date();
+//     const thresholdDate = new Date(today);
+//     thresholdDate.setDate(today.getDate() + daysThreshold);
     
-    // Find products expiring within the threshold period
-    const expiringProducts = await prisma.inventory.findMany({
-      where: {
-        expirationDate: {
-          not: null,
-          lte: thresholdDate,
-          gt: today, // Only include products not already expired
-        },
-        quantity: {
-          gt: 0, // Only include products still in stock
-        },
-      },
-      include: {
-        product: true,
-        supplier: {
-          select: {
-            name: true,
-            contact: true,
-            email: true,
-          },
-        },
-      },
-      orderBy: {
-        expirationDate: 'asc', // Sort by earliest expiry first
-      },
-    });
+//     // Find products expiring within the threshold period
+//     const expiringProducts = await prisma.inventory.findMany({
+//       where: {
+//         expirationDate: {
+//           not: null,
+//           lte: thresholdDate,
+//           gt: today, // Only include products not already expired
+//         },
+//         quantity: {
+//           gt: 0, // Only include products still in stock
+//         },
+//       },
+//       include: {
+//         product: true,
+//         supplier: {
+//           select: {
+//             name: true,
+//             contact: true,
+//             email: true,
+//           },
+//         },
+//       },
+//       orderBy: {
+//         expirationDate: 'asc', // Sort by earliest expiry first
+//       },
+//     });
     
-    // Calculate days remaining for each product
-    const formattedResults = expiringProducts.map(item => {
-      const daysRemaining = item.expirationDate 
-        ? Math.ceil((item.expirationDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)) 
-        : null;
+//     // Calculate days remaining for each product
+//     const formattedResults = expiringProducts.map(item => {
+//       const daysRemaining = item.expirationDate 
+//         ? Math.ceil((item.expirationDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)) 
+//         : null;
       
-      return {
-        id: item.id,
-        name: item.name,
-        productId: item.productId,
-        productName: item.product.name,
-        category: item.category,
-        quantity: item.quantity,
-        expirationDate: item.expirationDate,
-        daysRemaining,
-        price: item.price,
-        supplier: item.supplier,
-        suggestedAction: daysRemaining && daysRemaining <= 3 
-          ? 'Consider discount promotion' 
-          : 'Monitor stock levels'
-      };
-    });
+//       return {
+//         id: item.id,
+//         name: item.name,
+//         productId: item.productId,
+//         productName: item.product.name,
+//         category: item.category,
+//         quantity: item.quantity,
+//         expirationDate: item.expirationDate,
+//         daysRemaining,
+//         price: item.price,
+//         supplier: item.supplier,
+//         suggestedAction: daysRemaining && daysRemaining <= 3 
+//           ? 'Consider discount promotion' 
+//           : 'Monitor stock levels'
+//       };
+//     });
     
-    res.status(200).json({
-      count: formattedResults.length,
-      expiringProducts: formattedResults
-    });
+//     res.status(200).json({
+//       count: formattedResults.length,
+//       expiringProducts: formattedResults
+//     });
     
-  } catch (error) {
-    console.error('Error fetching expiring products:', error);
-    res.status(500).json({ error: 'Failed to fetch expiring products' });
-  }
-};
+//   } catch (error) {
+//     console.error('Error fetching expiring products:', error);
+//     res.status(500).json({ error: 'Failed to fetch expiring products' });
+//   }
+// };
 
 // Add endpoint to mark products as discounted or take action on expiring items
 export const createExpiryDiscount = async (req: Request, res: Response) => {
@@ -1116,6 +1331,150 @@ export const createExpiryDiscount = async (req: Request, res: Response) => {
   }
 };
 
+
+/*
+File: src/controllers/inventoryController.ts
+Description: An advanced controller to fetch expiring products with pagination, filtering, and detailed analytics.
+*/
+
+export const getExpiryReport = async (req: Request, res: Response) => {
+  try {
+    // --- 1. Input Validation & Pagination ---
+    const { 
+      days = '30', 
+      page = '1', 
+      limit = '10',
+      category, // Optional filter
+    } = req.query;
+
+    const daysThreshold = parseInt(days as string);
+    const pageNum = parseInt(page as string);
+    const limitNum = parseInt(limit as string);
+    const skip = (pageNum - 1) * limitNum;
+
+    if (isNaN(daysThreshold) || isNaN(pageNum) || isNaN(limitNum)) {
+         res.status(400).json({ error: 'Invalid query parameters for days, page, or limit.' });
+         return
+    }
+
+    // --- 2. Dynamic Date Calculation ---
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Start of today
+    const thresholdDate = new Date(today);
+    thresholdDate.setDate(today.getDate() + daysThreshold);
+
+    // --- 3. Dynamic Where Clause for Filtering ---
+    const whereClause: any = {
+      expirationDate: {
+        not: null,
+        lte: thresholdDate, // Is less than or equal to the threshold date
+        gte: today,         // Is greater than or equal to today (not yet expired)
+      },
+      quantity: {
+        gt: 0, // Only include products still in stock
+      },
+    };
+
+    if (category && typeof category === 'string') {
+      whereClause.product = {
+        category: {
+          equals: category,
+          mode: 'insensitive', // Case-insensitive category matching
+        },
+      };
+    }
+
+    // --- 4. Optimized Prisma Query with Pagination & Count ---
+    const expiringItemsPromise = prisma.inventory.findMany({
+      where: whereClause,
+      include: {
+        // Include related product and supplier data
+        product: {
+          select: {
+            name: true,
+            SKU: true,
+            imageUrls: true,
+            category: true,
+          },
+        },
+        supplier: {
+          select: {
+            name: true,
+          },
+        },
+      },
+      orderBy: {
+        expirationDate: 'asc', // Show items expiring soonest first
+      },
+      skip: skip,
+      take: limitNum,
+    });
+
+    // Run count query in parallel for efficiency
+    const totalCountPromise = prisma.inventory.count({ where: whereClause });
+
+    const [expiringItems, totalCount] = await Promise.all([
+        expiringItemsPromise,
+        totalCountPromise,
+    ]);
+
+    // --- 5. Advanced Data Transformation & Analytics ---
+    let totalValueAtRisk = 0;
+    const formattedResults = expiringItems.map(item => {
+      // Calculate days remaining (more robustly)
+      const daysRemaining = Math.ceil((item.expirationDate!.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      totalValueAtRisk += item.quantity * item.price;
+
+      // More nuanced suggested action
+      let suggestedAction = 'Monitor';
+      if (daysRemaining <= 3) {
+        suggestedAction = 'Immediate Discount';
+      } else if (daysRemaining <= 7) {
+        // Check if it's a slow-moving item
+        if (item.dailyAvgSales < 0.5) {
+            suggestedAction = 'Promotion Recommended';
+        } else {
+            suggestedAction = 'Prioritize Sale';
+        }
+      }
+
+      return {
+        inventoryId: item.id,
+        productName: item.product.name,
+        SKU: item.product.SKU || 'N/A',
+        imageUrls: item.product.imageUrls,
+        category: item.product.category,
+        quantity: item.quantity,
+        price: item.price,
+        totalValue: item.quantity * item.price,
+        expirationDate: item.expirationDate,
+        daysRemaining,
+        supplierName: item.supplier?.name || 'N/A',
+        suggestedAction,
+      };
+    });
+
+    // --- 6. Structured JSON Response ---
+    res.status(200).json({
+      summary: {
+        totalItems: totalCount,
+        totalValueAtRisk,
+        displaying: formattedResults.length,
+      },
+      pagination: {
+        currentPage: pageNum,
+        totalPages: Math.ceil(totalCount / limitNum),
+        limit: limitNum,
+        totalCount,
+      },
+      data: formattedResults,
+    });
+
+  } catch (error) {
+    console.error('Error fetching expiring products report:', error);
+    res.status(500).json({ error: 'An internal error occurred while fetching the expiry report.' });
+  }
+};
 
 
 
