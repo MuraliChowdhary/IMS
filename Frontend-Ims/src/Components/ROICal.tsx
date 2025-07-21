@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "./ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "./ui/dialog";
 import { Input } from "./ui/input";
-import { Label } from "./ui/label";
+import { Label } from "../Components/ui/label";
 
 export function ROICalculator() {
   const [investment, setInvestment] = useState("");

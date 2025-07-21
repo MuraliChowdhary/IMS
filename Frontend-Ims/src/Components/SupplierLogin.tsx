@@ -14,7 +14,7 @@ export const SupplierLogin = () => {
   const handleSubmit = async () => {
     try {
       const response = await axios.post(
-        "https://ims-clxd.onrender.com/api/auth/supplier/login",
+        "http://localhost:5000/api/auth/supplier/login",
         {
           email: email,
           password: password,

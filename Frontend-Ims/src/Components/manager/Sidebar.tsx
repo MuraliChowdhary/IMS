@@ -19,7 +19,7 @@ export function Sidebar() {
       } transition-all duration-300 bg-white border-r border-gray-200 flex flex-col`}
     >
       <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-        {isOpen && <h1 className="text-xl font-bold">Store Manager</h1>}
+        {isOpen && <h1 className="text-xl font-bold">Owner</h1>}
         <button
           onClick={toggleSidebar}
           className="text-gray-500 hover:text-gray-700 focus:outline-none"

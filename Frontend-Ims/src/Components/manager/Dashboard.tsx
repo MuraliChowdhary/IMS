@@ -3,7 +3,7 @@ import Inventory from './Inventory';
 import LowStock from './Lowstock';
 import AddInventory from './AddInventory';
 import ProductFilters from './productFilters';
-import { PendingOrderSupplier } from './pendingOrderSupplier';
+import  PendingOrderSupplier from './pendingOrderSupplier';
 // import LowStockWithSidebarPage from './LowStockWithSidebarPage';
 import UploadProductCSV from './UploadProductCSV';
 import { SidebarProvider, SidebarTrigger } from '../ui/sidebar';

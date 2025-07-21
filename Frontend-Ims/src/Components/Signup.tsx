@@ -33,7 +33,7 @@ export const Signup = () => {
 
     try {
       const response = await axios.post(
-        "https://ims-clxd.onrender.com/api/auth/register",
+        "http://localhost:5000/api/auth/register",
         {
           username: name,
           email,
@@ -153,8 +153,8 @@ export const Signup = () => {
                 type="submit"
                 disabled={loading}
                 className={`w-full bg-blue-600 text-white px-10 py-2 rounded font-sans transition-colors duration-200 ${loading
-                    ? "opacity-70 cursor-not-allowed"
-                    : "hover:bg-sky-600 cursor-pointer"
+                  ? "opacity-70 cursor-not-allowed"
+                  : "hover:bg-sky-600 cursor-pointer"
                   }`}
               >
                 {loading ? "Signing up..." : "Sign Up"}
