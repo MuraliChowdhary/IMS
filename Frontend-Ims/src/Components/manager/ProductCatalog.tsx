@@ -112,7 +112,7 @@ export default function ProductCatalogPage() {
         // --- REAL API CALL (commented out, using mock data for now) ---
         // const response = await axios.get(`/api/products?page=${page}&limit=10&search=${search}`);
         // setData(response.data);
-
+        console.log(page);
         // --- SIMULATING API CALL WITH MOCK DATA ---
         setTimeout(() => {
             const filteredProducts = mockApiResponse.products.filter(p => 

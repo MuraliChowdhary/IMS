@@ -2,7 +2,6 @@
 File: src/Components/managerNew/QuickActions.tsx
 Description: A card with main action buttons, including the trigger for the Add Product dialog.
 */
-import React from 'react';
 import { Button } from "@/Components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/Components/ui/card";
 import { IconPlus, IconFileImport, IconTransfer, IconFileAnalytics } from "@tabler/icons-react";

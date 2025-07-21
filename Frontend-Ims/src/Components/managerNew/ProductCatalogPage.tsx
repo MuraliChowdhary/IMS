@@ -2,7 +2,7 @@
 File: src/pages/manager/ProductCatalogPage.tsx
 Description: Displays all products from the inventory in a detailed, filterable table.
 */
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Table,
   TableBody,

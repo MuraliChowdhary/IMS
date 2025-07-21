@@ -2,7 +2,7 @@
 File: src/pages/manager/LowStockAlertsPage.tsx
 Description: A detailed page to view and manage products with low stock levels, connected to a live API.
 */
-import React, { useEffect, useState } from 'react';
+import  { useEffect, useState } from 'react';
 import axios from 'axios';
 import {
   Table,
