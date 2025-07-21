@@ -23,7 +23,7 @@ export default function LoginPage() {
             <div className="bg-white relative hidden lg:flex items-center justify-center p-10">
                 {/* The image is no longer a background, but a centered element */}
                 <img
-                    src="/PMIms.jpg" // This should be the path to your logo in the `public` folder
+                    src="PMIms.jpg" // This should be the path to your logo in the `public` folder
                     alt="PrimeMart Logo"
                     className="w-auto h-auto max-w-lg" // Controls the size of the logo
                 />
