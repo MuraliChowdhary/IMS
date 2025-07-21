@@ -33,7 +33,7 @@ export const Signup = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/auth/register",
+        "https://ims-clxd.onrender.com/api/auth/register",
         {
           username: name,
           email,

@@ -4,7 +4,7 @@ Description: A clean UI to display pending orders from suppliers, fetched from a
 */
 "use client";
 
-import  { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { Card, CardHeader, CardContent, CardTitle, CardDescription, CardFooter } from "@/Components/ui/card";
 import { Badge } from "@/Components/ui/badge";
@@ -42,23 +42,23 @@ type Order = {
 };
 
 interface ApiResponse {
-    pendingOrders: Order[];
+  pendingOrders: Order[];
 }
 
 // --- Helper Functions ---
 const formatCurrency = (value: number) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(value);
 
 const getStatusBadge = (status: string) => {
-    const statusMap: Record<string, string> = {
-        'REORDER_REQUESTED': 'bg-blue-100 text-blue-800',
-        'PENDING': 'bg-yellow-100 text-yellow-800',
-        'PRICE_PROPOSED': 'bg-purple-100 text-purple-800',
-    };
-    return (
-        <Badge variant="outline" className={`border-none ${statusMap[status] || 'bg-gray-100 text-gray-800'}`}>
-            {status.replace(/_/g, ' ')}
-        </Badge>
-    );
+  const statusMap: Record<string, string> = {
+    'REORDER_REQUESTED': 'bg-blue-100 text-blue-800',
+    'PENDING': 'bg-yellow-100 text-yellow-800',
+    'PRICE_PROPOSED': 'bg-purple-100 text-purple-800',
+  };
+  return (
+    <Badge variant="outline" className={`border-none ${statusMap[status] || 'bg-gray-100 text-gray-800'}`}>
+      {status.replace(/_/g, ' ')}
+    </Badge>
+  );
 };
 
 // --- Main Component ---
@@ -72,13 +72,13 @@ export default function PendingSupplierOrdersPage() {
       try {
         const token = localStorage.getItem("token");
         if (!token) {
-            toast.error("Authentication token not found. Please log in.");
-            setLoading(false);
-            return;
+          toast.error("Authentication token not found. Please log in.");
+          setLoading(false);
+          return;
         }
 
         const response = await axios.get<ApiResponse>(
-          "http://localhost:5000/api/manager/pendingStoreOrdersBySupplier",
+          "https://ims-clxd.onrender.com/api/manager/pendingStoreOrdersBySupplier",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -114,9 +114,9 @@ export default function PendingSupplierOrdersPage() {
 
       {!loading && orders.length === 0 && (
         <div className="flex flex-col items-center justify-center h-64 border-2 border-dashed rounded-lg">
-            <IconTruck className="h-12 w-12 text-muted-foreground" />
-            <h3 className="mt-4 text-lg font-semibold">All Caught Up!</h3>
-            <p className="text-muted-foreground">There are no pending orders from suppliers.</p>
+          <IconTruck className="h-12 w-12 text-muted-foreground" />
+          <h3 className="mt-4 text-lg font-semibold">All Caught Up!</h3>
+          <p className="text-muted-foreground">There are no pending orders from suppliers.</p>
         </div>
       )}
 
@@ -126,8 +126,8 @@ export default function PendingSupplierOrdersPage() {
             <CardHeader>
               <CardTitle className="flex justify-between items-start">
                 <div className="flex items-center gap-2">
-                    <IconHash className="h-5 w-5 text-muted-foreground" />
-                    <span className="truncate">Order #{order.id}</span>
+                  <IconHash className="h-5 w-5 text-muted-foreground" />
+                  <span className="truncate">Order #{order.id}</span>
                 </div>
                 {getStatusBadge(order.status)}
               </CardTitle>
@@ -139,13 +139,13 @@ export default function PendingSupplierOrdersPage() {
               <div className="border-t border-b py-4 mb-4">
                 <h4 className="font-semibold text-sm mb-2">Supplier Details</h4>
                 <div className="text-sm text-muted-foreground space-y-1">
-                    <p className="flex items-center gap-2 font-medium text-primary">{order.supplier.name}</p>
-                    <p className="flex items-center gap-2"><IconMail className="h-4 w-4"/> {order.supplier.email}</p>
-                    <p className="flex items-center gap-2"><IconPhone className="h-4 w-4"/> {order.supplier.contact}</p>
-                    <p className="flex items-center gap-2"><IconMapPin className="h-4 w-4"/> {order.supplier.location}</p>
+                  <p className="flex items-center gap-2 font-medium text-primary">{order.supplier.name}</p>
+                  <p className="flex items-center gap-2"><IconMail className="h-4 w-4" /> {order.supplier.email}</p>
+                  <p className="flex items-center gap-2"><IconPhone className="h-4 w-4" /> {order.supplier.contact}</p>
+                  <p className="flex items-center gap-2"><IconMapPin className="h-4 w-4" /> {order.supplier.location}</p>
                 </div>
               </div>
-              
+
               <h4 className="font-semibold text-sm mb-2">Products Requested</h4>
               <ScrollArea className="h-32 pr-4">
                 <ul className="space-y-2">
@@ -163,11 +163,11 @@ export default function PendingSupplierOrdersPage() {
               <p className="text-sm mt-4 text-muted-foreground">Notes: {order.orderNotes}</p>
             </CardContent>
             <CardFooter className="flex justify-between items-center bg-muted/50 px-6 py-4">
-                <p className="font-bold text-lg">Total: {formatCurrency(order.totalAmount)}</p>
-                <div className="flex gap-2">
-                    <Button variant="outline" size="sm"><IconCircleX className="h-4 w-4 mr-2"/> Reject</Button>
-                    <Button size="sm"><IconCircleCheck className="h-4 w-4 mr-2"/> Approve</Button>
-                </div>
+              <p className="font-bold text-lg">Total: {formatCurrency(order.totalAmount)}</p>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm"><IconCircleX className="h-4 w-4 mr-2" /> Reject</Button>
+                <Button size="sm"><IconCircleCheck className="h-4 w-4 mr-2" /> Approve</Button>
+              </div>
             </CardFooter>
           </Card>
         ))}
