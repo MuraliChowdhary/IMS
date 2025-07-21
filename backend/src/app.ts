@@ -26,7 +26,7 @@ app.use(express.json());
  
 
 app.use("/*", cors({
-  origin: ['https://inventorysolutions.vercel.app', 'http://localhost:5173'],
+  origin: ['https://inventorysolutions.vercel.app', 'http://localhost:5173','https://primemart-app.vercel.app'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
