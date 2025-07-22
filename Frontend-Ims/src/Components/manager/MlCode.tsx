@@ -177,7 +177,7 @@ const MLDashboard: React.FC = () => {
   const fetchData = async (endpoint: string, setData: any, loadingKey: string) => {
     try {
       setLoading(prev => ({ ...prev, [loadingKey]: true }));
-      const response = await axios.get(`http://127.0.0.1:8000/api/ml/${endpoint}`, {
+      const response = await axios.get(`https://api-historicalsalesdata.onrender.com/api/ml/${endpoint}`, {
         headers: {
           "Content-Type": "application/json",
         //  Authorization: "Bearer " + localStorage.getItem("token")
