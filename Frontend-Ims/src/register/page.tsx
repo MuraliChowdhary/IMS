@@ -4,6 +4,7 @@ Description: The main page for user registration.
 */
 import { GalleryVerticalEnd } from "lucide-react";
 import { SignupForm } from "@/Components/Signup"; // Import the new form
+import { imageUrl } from "@/config";
 
 export default function SignupPage() {
     return (
@@ -26,7 +27,7 @@ export default function SignupPage() {
              <div className="bg-white relative hidden lg:flex items-center justify-center p-10">
                 {/* The image is no longer a background, but a centered element */}
                 <img
-                    src="PMIms.jpg" // This should be the path to your logo in the `public` folder
+                    src={imageUrl} // This should be the path to your logo in the `public` folder
                     alt="PrimeMart Logo"
                     className="w-auto h-auto max-w-lg" // Controls the size of the logo
                 />

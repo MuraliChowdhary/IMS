@@ -1,7 +1,9 @@
 import { GalleryVerticalEnd } from "lucide-react"
 import { LoginForm } from "@/Components/login-form"
+import { imageUrl } from "@/config"
 
 export default function LoginPage() {
+     // Ensure this path is correct relative to the public folder 
     return (
         <div className="grid min-h-svh lg:grid-cols-2">
             <div className="flex flex-col gap-4 p-6 md:p-10">
@@ -22,12 +24,15 @@ export default function LoginPage() {
             {/* --- Corrected Image Section --- */}
             <div className="bg-white relative hidden lg:flex items-center justify-center p-10">
                 {/* The image is no longer a background, but a centered element */}
+
+                
                 <img
-                    src="PMIms.jpg" // This should be the path to your logo in the `public` folder
+                    src={imageUrl}// This should be the path to your logo in the `public` folder
                     alt="PrimeMart Logo"
                     className="w-auto h-auto max-w-lg" // Controls the size of the logo
                 />
             </div>
         </div>
+        
     )
 }
