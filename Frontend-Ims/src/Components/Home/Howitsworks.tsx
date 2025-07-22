@@ -33,7 +33,7 @@ const HowItWorksPage: React.FC = () => {
                 Customers can effortlessly browse and purchase products by logging into their personalized accounts. Our user-friendly interface ensures a smooth shopping journey.
               </p>
               <p className="text-gray-700">
-                <strong>Test it out:</strong> <a href="https://inventorysolutions.vercel.app/signin" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Customer Dashboard</a>
+                <strong>Test it out:</strong> <a href="https://inventorysolutions.vercel.app/login" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Customer Dashboard</a>
                 <br />
                 Email: <code className="bg-gray-100 p-1 rounded">customer@gmail.com</code>
                 <br />
@@ -56,7 +56,7 @@ const HowItWorksPage: React.FC = () => {
                 Upon successful payment, our system automatically updates stock levels in real-time.
               </p>
               <p className="text-gray-700">
-                <strong>Test it out:</strong> <a href="https://inventorysolutions.vercel.app/signin" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Cashier Login</a>
+                <strong>Test it out:</strong> <a href="https://inventorysolutions.vercel.app/login" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Cashier Login</a>
                 <br />
                 Email: <code className="bg-gray-100 p-1 rounded">cashier@gmail.com</code>
                 <br />
@@ -81,7 +81,7 @@ const HowItWorksPage: React.FC = () => {
                 <li>Expiry Items: Keep track of products nearing their expiry dates.</li>
               </ul>
               <p className="text-gray-700 mt-4">
-                <strong>Test it out:</strong> <a href="https://inventorysolutions.vercel.app/signin" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Manager Login</a>
+                <strong>Test it out:</strong> <a href="https://inventorysolutions.vercel.app/login" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Manager Login</a>
                 <br />
                 Email: <code className="bg-gray-100 p-1 rounded">manager@gmail.com</code>
                 <br />
@@ -144,7 +144,7 @@ const HowItWorksPage: React.FC = () => {
                 Our Sales Dashboard provides a detailed "Sales Overview" with a bar chart visualizing sales data, along with "Total Sales," "Total Revenue," "Total Customers," and "Low Stock" metrics. You'll also see "Top Customers" for the month.
               </p>
               <p className="text-gray-700">
-                <strong>Test it out:</strong> <a href="https://inventorysolutions.vercel.app/signin" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Sales Login</a>
+                <strong>Test it out:</strong> <a href="https://inventorysolutions.vercel.app/login" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">Sales Login</a>
                 <br />
                 Email: <code className="bg-gray-100 p-1 rounded">sales@gmail.com</code>
                 <br />

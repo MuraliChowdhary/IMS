@@ -19,7 +19,7 @@ export const Navbar = () => {
   };
 
   const handleSignin = () => {
-    navigate("/signin");
+    navigate("/login");
   };
 
   const handleLogout = () => {

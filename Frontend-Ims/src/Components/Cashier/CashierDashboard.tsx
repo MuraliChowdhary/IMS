@@ -135,7 +135,7 @@ const CashierDashboard = () => {
               <a
                 onClick={() => {
                   localStorage.removeItem("token");
-                  window.location.href = "/signin";
+                  window.location.href = "/login";
                 }}
               >
                 logout

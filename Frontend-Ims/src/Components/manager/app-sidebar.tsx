@@ -81,7 +81,7 @@ import {
                 <SidebarMenuItem>
                   <SidebarMenuButton asChild>
                     <a
-                      onClick={()=>{window.localStorage.removeItem("token"); window.location.href="/signin"}}
+                      onClick={()=>{window.localStorage.removeItem("token"); window.location.href="/login"}}
                       className="flex items-center gap-2 text-red-600 hover:bg-red-50"
                     >
                       <LogOut className="w-4 h-4" />
