@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { REACT_APP_RAZORPAY_KEY_ID } from "../../../Config";
 import { LoadingBUtton } from "../LoadingButton";
+import { generateAndDownloadReceipt } from "@/api/receiptApi";
 
 console.log(REACT_APP_RAZORPAY_KEY_ID);
 // Define the types for Razorpay response and options
@@ -113,14 +114,25 @@ export const ProcessPayment: React.FC<ProcessPaymentProps> = ({
           // Check if payment processing was successful
           if (result.ok) {
             console.log("Payment success:", data);
+ 
+              const orderId = data.order.id;
+              const authToken = localStorage.getItem('authToken') || '';
 
-            navigate("/cashierDashboard"); // Navigate on success
+              // Await the download function to complete
+              await generateAndDownloadReceipt(orderId, authToken);
+
+              navigate("/cashierDashboard");
           } else {
             throw new Error(data.message || "Payment processing failed");
           }
         } catch (error) {
           alert("Payment failed. Please try again.");
           console.error("Payment Error:", error);
+          
+              const authToken = localStorage.getItem('authToken') || '';
+
+              // Await the download function to complete
+              await generateAndDownloadReceipt(orderId, authToken);
         } finally {
           setLoading(false);
         }
